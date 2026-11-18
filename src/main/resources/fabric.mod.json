@@ -7,7 +7,7 @@
 	"authors": [
 		"JONE500"
 	],
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/jone500_wooden_api/icon.png",
 	"environment": "*",
 	"entrypoints": {
