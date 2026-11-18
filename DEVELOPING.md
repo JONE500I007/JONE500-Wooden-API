@@ -27,20 +27,25 @@ Notes for working on Wooden API itself. If you only want to **use** Wooden API i
 Wooden API is distributed through Modrinth, which also serves every uploaded version as a maven
 artifact (`maven.modrinth:jone500-wooden-api:<version>`).
 
-1. Change `version` in `gradle.properties`.
+1. Change `mod_version` in `gradle.properties` (e.g. `1.0.1`).
 2. Run `gradlew runGameTest` and `gradlew runClientGameTest`, and look at the screenshots.
 3. Run `gradlew build`.
 4. On Modrinth, create a new version of the `jone500-wooden-api` project with the **same version number**
-   and upload `build/libs/jone500-wooden-api-<version>.jar` as the primary file.
+   as the jar (e.g. `1.0.1+1.21.10`), tick the matching game version, and upload
+   `build/libs/jone500-wooden-api-<version>.jar` as the primary file.
+5. Do the same on every Minecraft branch (`1.21.9`, `1.21.10`, ...).
 
-The version number on Modrinth is what modders put in `maven.modrinth:jone500-wooden-api:<version>`.
+The full version number is `<mod_version>+<minecraft_version>`. `build.gradle` puts it together, so
+you only ever edit `mod_version`; the jar name and `fabric.mod.json` get the full number
+automatically. The version number on Modrinth is what modders put in
+`maven.modrinth:jone500-wooden-api:<version>`, so it must match the jar exactly.
 
 ### Choosing the version number
 
 Mods that use Wooden API may run with a **newer** Wooden API than the one they were built with
 (players update it, or another mod ships a newer copy). So pick the number by what changed:
 
-| What you changed | Example | New version |
+| What you changed | Example | New `mod_version` |
 |---|---|---|
 | Fixed a bug, no method added/removed/renamed | sign texture fix | `1.0.0` → `1.0.1` |
 | Added something, nothing removed or renamed | new `.door()` method, new getter | `1.0.0` → `1.1.0` |
@@ -64,9 +69,8 @@ own build:
 2. Fix compile errors. Then run `gradlew runGameTest` and `gradlew runClientGameTest`, and open the
    images in `build/run/clientGameTest/screenshots` to make sure the signs, boats and shelf still
    look right.
-3. When you support more than one Minecraft version at the same time, add the Minecraft version
-   to the version number so the two builds don't share a number, e.g. `1.1.0+1.21.9` and
-   `1.1.0+1.21.10`. On Modrinth, tick the matching game version for each upload.
+3. The Minecraft part of the version number (`+1.21.10`) comes from `minecraft_version`, so it
+   changes by itself. Each Minecraft version lives on its own git branch (`1.21.9`, `1.21.10`, ...).
 
 ### Minecraft EULA
 

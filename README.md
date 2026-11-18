@@ -20,9 +20,21 @@ Each Minecraft version has its own Wooden API file. On the
 [Modrinth versions page](https://modrinth.com/mod/jone500-wooden-api/versions), pick the file for
 **your** Minecraft version and use its version number in [step 1](#1-add-wooden-api-to-your-mod).
 
+The version number has two parts: the Wooden API version, then `+`, then the Minecraft version.
+
+```
+1.0.0+1.21.10
+└─┬─┘ └──┬──┘
+  │      └── for Minecraft 1.21.10
+  └───────── Wooden API version 1.0.0
+```
+
+So for Minecraft 1.21.9 you would use `1.0.0+1.21.9`, and for 1.21.10 `1.0.0+1.21.10`. The
+examples below use `1.0.0+1.21.10`; change the part after `+` to **your** Minecraft version.
+
 ## Requirements
 
-- Fabric Loader (0.20.1 or newer for 1.21.9)
+- Fabric Loader (0.20.1 or newer for 1.21.10)
 - **Fabric API**
 - The Java version your Minecraft version needs (Java **21** for 1.21.x)
 
@@ -58,10 +70,10 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:jone500-wooden-api:1.0.0"
+    modImplementation "maven.modrinth:jone500-wooden-api:1.0.0+1.21.10"
 
     // Optional, see below
-    // include "maven.modrinth:jone500-wooden-api:1.0.0"
+    // include "maven.modrinth:jone500-wooden-api:1.0.0+1.21.10"
 }
 ```
 
@@ -75,7 +87,8 @@ In your `fabric.mod.json`, add Wooden API to `depends`:
 }
 ```
 
-If a player has an older Wooden API than this, Fabric shows a clear "please update Wooden API"
+Here you write only the Wooden API part (`1.0.0`), without `+1.21.10`. If a player has an older
+Wooden API than this, Fabric shows a clear "please update Wooden API"
 message instead of crashing.
 
 **What is `include`?**
@@ -89,8 +102,8 @@ too: you need both. Your `dependencies` in `build.gradle` then look like this:
 
 ```groovy
 dependencies {
-    modImplementation "maven.modrinth:jone500-wooden-api:1.0.0"   // lets you use Wooden API in your code
-    include "maven.modrinth:jone500-wooden-api:1.0.0"             // puts Wooden API inside your mod's jar
+    modImplementation "maven.modrinth:jone500-wooden-api:1.0.0+1.21.10"   // lets you use Wooden API in your code
+    include "maven.modrinth:jone500-wooden-api:1.0.0+1.21.10"             // puts Wooden API inside your mod's jar
 }
 ```
 
@@ -319,7 +332,7 @@ Only draw the ones for the things you added. For example, with only `.signs()` y
 
 **Easiest way to start:** copy the oak textures from Minecraft and recolor them. They are inside
 the Minecraft jar, which you can open like a zip file. On Windows it is usually at
-`%APPDATA%\.minecraft\versions\1.21.9\1.21.9.jar` (start 1.21.9 once in the launcher if it is not
+`%APPDATA%\.minecraft\versions\1.21.10\1.21.10.jar` (start 1.21.10 once in the launcher if it is not
 there). Inside, go to `assets/minecraft/textures/` and use the same paths as the table, with `oak`
 instead of `maple`. Keep the same image size and layout.
 
@@ -474,8 +487,10 @@ Try placing each sign, writing on it, putting items on the shelf and riding the 
 1. Check the changelog of the new version on Modrinth.
 2. Change the version number in your `build.gradle`:
    ```groovy
-   modImplementation "maven.modrinth:jone500-wooden-api:1.1.0"   // was 1.0.0
+   modImplementation "maven.modrinth:jone500-wooden-api:1.1.0+1.21.10"   // was 1.0.0+1.21.10
    ```
+   If you also moved your mod to a new Minecraft version, change the part after `+` too
+   (e.g. `1.1.0+1.21.11`).
 3. Reload Gradle in your IDE.
 4. If you use something that is new in this version, raise the `>=` version in your
    `fabric.mod.json` too.
@@ -483,7 +498,8 @@ Try placing each sign, writing on it, putting items on the shelf and riding the 
 Nothing updates by itself: if you don't change the number, your mod keeps using the old version,
 which stays available on Modrinth.
 
-What the version number tells you (it follows [Semantic Versioning](https://semver.org)):
+What the Wooden API part of the version number tells you (it follows
+[Semantic Versioning](https://semver.org)):
 
 | Version change | What changed | Do you need to change your code? |
 |---|---|---|
