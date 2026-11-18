@@ -23,20 +23,20 @@ Each Minecraft version has its own Wooden API file. On the
 The version number has two parts: the Wooden API version, then `+`, then the Minecraft version.
 
 ```
-1.0.0+1.21.11
+1.0.0+26.1
 └─┬─┘ └──┬──┘
-  │      └── for Minecraft 1.21.11
+  │      └── for Minecraft 26.1
   └───────── Wooden API version 1.0.0
 ```
 
-So for Minecraft 1.21.9 you would use `1.0.0+1.21.9`, and for 1.21.11 `1.0.0+1.21.11`. The
-examples below use `1.0.0+1.21.11`; change the part after `+` to **your** Minecraft version.
+So for Minecraft 1.21.11 you would use `1.0.0+1.21.11`, and for 26.1 `1.0.0+26.1`. The
+examples below use `1.0.0+26.1`; change the part after `+` to **your** Minecraft version.
 
 ## Requirements
 
-- Fabric Loader (0.20.1 or newer for 1.21.11)
+- Fabric Loader (0.20.1 or newer for 26.1)
 - **Fabric API**
-- The Java version your Minecraft version needs (Java **21** for 1.21.x)
+- The Java version your Minecraft version needs (Java **25** for 26.x, Java 21 for 1.21.x)
 
 ## Overview
 
@@ -70,12 +70,15 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:jone500-wooden-api:1.0.0+1.21.11"
+    implementation "maven.modrinth:jone500-wooden-api:1.0.0+26.1"
 
     // Optional, see below
-    // include "maven.modrinth:jone500-wooden-api:1.0.0+1.21.11"
+    // include "maven.modrinth:jone500-wooden-api:1.0.0+26.1"
 }
 ```
+
+From Minecraft 26.1 on, Fabric uses `implementation` here. (On 1.21.x it was `modImplementation`;
+if your mod is still on 1.21.x, see the README of that Wooden API version.)
 
 Then reload Gradle in your IDE (IntelliJ: the elephant "Load Gradle Changes" button).
 
@@ -87,7 +90,7 @@ In your `fabric.mod.json`, add Wooden API to `depends`:
 }
 ```
 
-Here you write only the Wooden API part (`1.0.0`), without `+1.21.11`. If a player has an older
+Here you write only the Wooden API part (`1.0.0`), without `+26.1`. If a player has an older
 Wooden API than this, Fabric shows a clear "please update Wooden API"
 message instead of crashing.
 
@@ -97,13 +100,13 @@ message instead of crashing.
 API comes with it, so they don't have to find and download Wooden API themselves. Fabric loads it
 from inside your jar automatically.
 
-To use it, remove the `//` in front of the `include` line above. Keep the `modImplementation` line
+To use it, remove the `//` in front of the `include` line above. Keep the `implementation` line
 too: you need both. Your `dependencies` in `build.gradle` then look like this:
 
 ```groovy
 dependencies {
-    modImplementation "maven.modrinth:jone500-wooden-api:1.0.0+1.21.11"   // lets you use Wooden API in your code
-    include "maven.modrinth:jone500-wooden-api:1.0.0+1.21.11"             // puts Wooden API inside your mod's jar
+    implementation "maven.modrinth:jone500-wooden-api:1.0.0+26.1"   // lets you use Wooden API in your code
+    include "maven.modrinth:jone500-wooden-api:1.0.0+26.1"          // puts Wooden API inside your mod's jar
 }
 ```
 
@@ -126,7 +129,7 @@ don't conflict.
 ### The name decides everything
 
 ```java
-WoodSet.builder(Identifier.of("mymod", "maple"))
+WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "maple"))
 ```
 
 - `"mymod"` must be **your mod id** (the `"id"` in your `fabric.mod.json`).
@@ -153,10 +156,10 @@ WoodSet.builder(Identifier.of("mymod", "maple"))
 ### Example 1: everything, with `.all()`
 
 ```java
-public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "maple"))
+public static final WoodSet MAPLE = WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "maple"))
         .planks(ModBlocks.MAPLE_PLANKS)
         .strippedLog(ModBlocks.STRIPPED_MAPLE_LOG)
-        .mapColor(MapColor.ORANGE)
+        .mapColor(MapColor.COLOR_ORANGE)
         .all()
         .register();
 ```
@@ -166,10 +169,10 @@ public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "mapl
 This does exactly the same as Example 1. `.all()` is just shorter.
 
 ```java
-public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "maple"))
+public static final WoodSet MAPLE = WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "maple"))
         .planks(ModBlocks.MAPLE_PLANKS)
         .strippedLog(ModBlocks.STRIPPED_MAPLE_LOG)
-        .mapColor(MapColor.ORANGE)
+        .mapColor(MapColor.COLOR_ORANGE)
         .signs()
         .hangingSigns()
         .boats()
@@ -182,9 +185,9 @@ public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "mapl
 Leave out the lines you don't want. Here: only a sign and a boat.
 
 ```java
-public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "maple"))
+public static final WoodSet MAPLE = WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "maple"))
         .planks(ModBlocks.MAPLE_PLANKS)   // signs and boats only need planks
-        .mapColor(MapColor.ORANGE)
+        .mapColor(MapColor.COLOR_ORANGE)
         .signs()
         .boats()
         .register();
@@ -193,9 +196,9 @@ public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "mapl
 Only a hanging sign and a shelf:
 
 ```java
-public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "maple"))
+public static final WoodSet MAPLE = WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "maple"))
         .strippedLog(ModBlocks.STRIPPED_MAPLE_LOG)   // hanging signs and shelves only need the stripped log
-        .mapColor(MapColor.ORANGE)
+        .mapColor(MapColor.COLOR_ORANGE)
         .hangingSigns()
         .shelf()
         .register();
@@ -204,10 +207,10 @@ public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "mapl
 ### Example 4: rafts instead of boats (like bamboo)
 
 ```java
-public static final WoodSet PALM = WoodSet.builder(Identifier.of("mymod", "palm"))
+public static final WoodSet PALM = WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "palm"))
         .planks(ModBlocks.PALM_PLANKS)
         .strippedLog(ModBlocks.STRIPPED_PALM_LOG)
-        .mapColor(MapColor.PALE_YELLOW)
+        .mapColor(MapColor.SAND)
         .signs()
         .hangingSigns()
         .rafts()          // instead of .boats()
@@ -218,10 +221,10 @@ public static final WoodSet PALM = WoodSet.builder(Identifier.of("mymod", "palm"
 ### Example 5: wood that does not burn, with Nether wood sounds
 
 ```java
-public static final WoodSet GLOOMWOOD = WoodSet.builder(Identifier.of("mymod", "gloomwood"))
+public static final WoodSet GLOOMWOOD = WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "gloomwood"))
         .planks(ModBlocks.GLOOMWOOD_PLANKS)
         .strippedLog(ModBlocks.STRIPPED_GLOOMWOOD_STEM)
-        .mapColor(MapColor.PURPLE)
+        .mapColor(MapColor.COLOR_PURPLE)
         .woodType(WoodTypeBuilder.copyOf(WoodType.CRIMSON))  // sounds like crimson wood
         .nonFlammable()                                      // fire and lava don't burn it
         .signs()
@@ -239,15 +242,15 @@ Make a new class for your wood sets:
 ```java
 package com.example.mymod;
 
-import net.minecraft.block.MapColor;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.resources.Identifier;
 import net.wooden.api.wood.WoodSet;
 
 public class ModWoods {
-    public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "maple"))
+    public static final WoodSet MAPLE = WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "maple"))
             .planks(ModBlocks.MAPLE_PLANKS)
             .strippedLog(ModBlocks.STRIPPED_MAPLE_LOG)
-            .mapColor(MapColor.ORANGE)
+            .mapColor(MapColor.COLOR_ORANGE)
             .all()
             .register();
 
@@ -273,7 +276,7 @@ For Example 5 you also need these imports:
 
 ```java
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
-import net.minecraft.block.WoodType;
+import net.minecraft.world.level.block.state.properties.WoodType;
 ```
 
 That's all the Java you need. Boat rendering and sign textures are set up automatically. You
@@ -311,7 +314,7 @@ the game stops with an error that tells you which method is missing.
 
 ## 3. Draw the textures
 
-For `Identifier.of("mymod", "maple")`, put these files in
+For `Identifier.fromNamespaceAndPath("mymod", "maple")`, put these files in
 `src/main/resources/assets/mymod/textures/`:
 
 | File | What it is |
@@ -332,7 +335,7 @@ Only draw the ones for the things you added. For example, with only `.signs()` y
 
 **Easiest way to start:** copy the oak textures from Minecraft and recolor them. They are inside
 the Minecraft jar, which you can open like a zip file. On Windows it is usually at
-`%APPDATA%\.minecraft\versions\1.21.11\1.21.11.jar` (start 1.21.11 once in the launcher if it is not
+`%APPDATA%\.minecraft\versions\26.1\26.1.jar` (start 26.1 once in the launcher if it is not
 there). Inside, go to `assets/minecraft/textures/` and use the same paths as the table, with `oak`
 instead of `maple`. Keep the same image size and layout.
 
@@ -402,7 +405,7 @@ Then add the names inside your own `FabricLanguageProvider`:
 
 ```java
 @Override
-public void generateTranslations(RegistryWrapper.WrapperLookup lookup, TranslationBuilder builder) {
+public void generateTranslations(HolderLookup.Provider lookup, TranslationBuilder builder) {
     WoodenDatagen.generateTranslations(builder, ModWoods.MAPLE, "Maple");
     // ... your other names
 }
@@ -414,26 +417,26 @@ Instead of `addProviders`, call these from the providers you already have:
 
 ```java
 // In your FabricModelProvider
-public void generateBlockStateModels(BlockStateModelGenerator gen) {
+public void generateBlockStateModels(BlockModelGenerators gen) {
     WoodenDatagen.generateBlockStateModels(gen, ModWoods.MAPLE);
 }
-public void generateItemModels(ItemModelGenerator gen) {
+public void generateItemModels(ItemModelGenerators gen) {
     WoodenDatagen.generateItemModels(gen, ModWoods.MAPLE);
 }
 
-// In your FabricRecipeProvider, inside the RecipeGenerator's generate()
-WoodenDatagen.generateRecipes(this, exporter, ModWoods.MAPLE);
+// In your FabricRecipeProvider, inside the RecipeProvider's buildRecipes()
+WoodenDatagen.generateRecipes(this, output, ModWoods.MAPLE);
 
-// In your FabricBlockLootTableProvider's generate()
+// In your FabricBlockLootSubProvider's generate()
 WoodenDatagen.generateLootTables(this, ModWoods.MAPLE);
 
-// In your FabricTagProvider.BlockTagProvider's configure()
+// In your FabricTagsProvider.BlockTagsProvider's addTags()
 WoodenDatagen.generateBlockTags((tag, block) -> valueLookupBuilder(tag).add(block), ModWoods.MAPLE);
 
-// In your FabricTagProvider.ItemTagProvider's configure()
+// In your FabricTagsProvider.ItemTagsProvider's addTags()
 WoodenDatagen.generateItemTags((tag, item) -> valueLookupBuilder(tag).add(item), ModWoods.MAPLE);
 
-// In your FabricTagProvider.EntityTypeTagProvider's configure()
+// In your FabricTagsProvider.EntityTypeTagsProvider's addTags()
 WoodenDatagen.generateEntityTypeTags((tag, type) -> valueLookupBuilder(tag).add(type), ModWoods.MAPLE);
 ```
 
@@ -487,10 +490,10 @@ Try placing each sign, writing on it, putting items on the shelf and riding the 
 1. Check the changelog of the new version on Modrinth.
 2. Change the version number in your `build.gradle`:
    ```groovy
-   modImplementation "maven.modrinth:jone500-wooden-api:1.1.0+1.21.11"   // was 1.0.0+1.21.11
+   implementation "maven.modrinth:jone500-wooden-api:1.1.0+26.1"   // was 1.0.0+26.1
    ```
    If you also moved your mod to a new Minecraft version, change the part after `+` too
-   (e.g. `1.1.0+26.1`).
+   (e.g. `1.1.0+26.2`).
 3. Reload Gradle in your IDE.
 4. If you use something that is new in this version, raise the `>=` version in your
    `fabric.mod.json` too.
@@ -509,19 +512,23 @@ What the Wooden API part of the version number tells you (it follows
 
 ---
 
-## Using Mojang mappings?
+## Coming from Minecraft 1.21.x?
 
-The examples use **Yarn** names (the Fabric default). Wooden API works the same with **Mojang
-mappings**: all Wooden API names (`WoodSet`, `.signs()`, `WoodenDatagen`, ...) stay the same, only
-Minecraft's own class names are different. The ones you will meet:
+From 26.1 on, Minecraft code uses **Mojang's names** (Yarn is no longer used), and some Fabric API
+names changed too. All Wooden API names (`WoodSet`, `.signs()`, `WoodenDatagen`, ...) stay the
+same. The names from this README that changed:
 
-| Yarn (in the examples) | Mojang mappings |
+| 1.21.x (Yarn) | 26.1 and newer |
 |---|---|
-| `Identifier.of("mymod", "maple")` | `ResourceLocation.fromNamespaceAndPath("mymod", "maple")` |
+| `modImplementation` (in `build.gradle`) | `implementation` |
+| `Identifier.of("mymod", "maple")` | `Identifier.fromNamespaceAndPath("mymod", "maple")` |
+| `MapColor.ORANGE` | `MapColor.COLOR_ORANGE` |
 | `BlockStateModelGenerator` | `BlockModelGenerators` |
 | `ItemModelGenerator` | `ItemModelGenerators` |
-| `RecipeGenerator` | `RecipeProvider` |
-| `BlockLootTableGenerator` | `BlockLootSubProvider` |
+| `RecipeGenerator` (`generate()`) | `RecipeProvider` (`buildRecipes()`) |
+| `FabricBlockLootTableProvider` | `FabricBlockLootSubProvider` |
+| `FabricTagProvider.BlockTagProvider` (`configure()`) | `FabricTagsProvider.BlockTagsProvider` (`addTags()`) |
+| `FabricDataOutput` | `FabricPackOutput` |
 | `RegistryWrapper.WrapperLookup` | `HolderLookup.Provider` |
 
 ---

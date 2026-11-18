@@ -31,9 +31,9 @@ artifact (`maven.modrinth:jone500-wooden-api:<version>`).
 2. Run `gradlew runGameTest` and `gradlew runClientGameTest`, and look at the screenshots.
 3. Run `gradlew build`.
 4. On Modrinth, create a new version of the `jone500-wooden-api` project with the **same version number**
-   as the jar (e.g. `1.0.1+1.21.11`), tick the matching game version, and upload
+   as the jar (e.g. `1.0.1+26.1`), tick the matching game version, and upload
    `build/libs/jone500-wooden-api-<version>.jar` as the primary file.
-5. Do the same on every Minecraft branch (`1.21.9`, `1.21.10`, `1.21.11`, ...).
+5. Do the same on every Minecraft branch (`1.21.9`, `1.21.10`, `1.21.11`, `26.1`, ...).
 
 The full version number is `<mod_version>+<minecraft_version>`. `build.gradle` puts it together, so
 you only ever edit `mod_version`; the jar name and `fabric.mod.json` get the full number
@@ -63,14 +63,30 @@ The first two are safe: old mods keep working. The last one breaks mods built fo
 Minecraft updates usually change code that Wooden API uses, so each Minecraft version needs its
 own build:
 
-1. Update `minecraft_version`, `yarn_mappings`, `loader_version` and `fabric_api_version` in
-   `gradle.properties` (values from <https://fabricmc.net/develop>), and `"minecraft"` in
+1. Update `minecraft_version`, `loader_version` and `fabric_api_version` in `gradle.properties`
+   (values from <https://fabricmc.net/develop>), and `"minecraft"` in
    `src/main/resources/fabric.mod.json`.
-2. Fix compile errors. Then run `gradlew runGameTest` and `gradlew runClientGameTest`, and open the
-   images in `build/run/clientGameTest/screenshots` to make sure the signs, boats and shelf still
-   look right.
-3. The Minecraft part of the version number (`+1.21.11`) comes from `minecraft_version`, so it
-   changes by itself. Each Minecraft version lives on its own git branch (`1.21.9`, `1.21.10`, `1.21.11`, ...).
+2. Fix compile errors. Then run `gradlew runDatagen`, `gradlew runGameTest` and
+   `gradlew runClientGameTest`, and open the images in `build/run/clientGameTest/screenshots` to
+   make sure the signs, boats and shelf still look right.
+3. The Minecraft part of the version number (`+26.1`) comes from `minecraft_version`, so it
+   changes by itself. Each Minecraft version lives on its own git branch
+   (`1.21.9`, `1.21.10`, `1.21.11`, `26.1`, ...).
+4. Update the Minecraft version in the README examples (`1.0.0+26.1`, the Minecraft jar path).
+
+### 1.21.x branches vs 26.x branches
+
+Minecraft 26.1 is no longer obfuscated, so the two kinds of branches are set up differently:
+
+| | 1.21.x branches | 26.x branches |
+|---|---|---|
+| Loom plugin | `net.fabricmc.fabric-loom-remap` | `net.fabricmc.fabric-loom` |
+| Names in the code | Yarn (`yarn_mappings` in `gradle.properties`) | Mojang's own names (no mappings line) |
+| Dependencies | `modImplementation` | `implementation` |
+| Java | 21 | 25 |
+
+A fix made on one kind of branch has to be rewritten with the other names when it is copied to the
+other kind.
 
 ### Minecraft EULA
 

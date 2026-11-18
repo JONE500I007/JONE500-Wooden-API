@@ -6,49 +6,51 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSetType;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.HangingSignBlock;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.ShelfBlock;
-import net.minecraft.block.SignBlock;
-import net.minecraft.block.WallHangingSignBlock;
-import net.minecraft.block.WallSignBlock;
-import net.minecraft.block.WoodType;
-import net.minecraft.block.dispenser.BoatDispenserBehavior;
-import net.minecraft.block.enums.NoteBlockInstrument;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
-import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.entity.vehicle.ChestBoatEntity;
-import net.minecraft.entity.vehicle.ChestRaftEntity;
-import net.minecraft.entity.vehicle.RaftEntity;
-import net.minecraft.item.BoatItem;
-import net.minecraft.item.HangingSignItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.Items;
-import net.minecraft.item.SignItem;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.dispenser.BoatDispenseItemBehavior;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.entity.vehicle.boat.Boat;
+import net.minecraft.world.entity.vehicle.boat.ChestBoat;
+import net.minecraft.world.entity.vehicle.boat.ChestRaft;
+import net.minecraft.world.entity.vehicle.boat.Raft;
+import net.minecraft.world.item.BoatItem;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.HangingSignItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.SignItem;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CeilingHangingSignBlock;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.ShelfBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StandingSignBlock;
+import net.minecraft.world.level.block.WallHangingSignBlock;
+import net.minecraft.world.level.block.WallSignBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraft.world.level.material.MapColor;
 
 /**
  * A set of wood-based content (signs, hanging signs, boats, chest boats, shelf) for one wood type.
@@ -56,10 +58,10 @@ import net.minecraft.util.Identifier;
  * <p>Create it once, in your mod's {@code onInitialize()}, usually as a {@code static final} field:
  *
  * <pre>{@code
- * public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "maple"))
+ * public static final WoodSet MAPLE = WoodSet.builder(Identifier.fromNamespaceAndPath("mymod", "maple"))
  *         .planks(() -> ModBlocks.MAPLE_PLANKS)
  *         .strippedLog(() -> ModBlocks.STRIPPED_MAPLE_LOG)
- *         .mapColor(MapColor.ORANGE)
+ *         .mapColor(MapColor.COLOR_ORANGE)
  *         .all()          // signs + hanging signs + boats + shelf
  *         .register();
  * }</pre>
@@ -105,8 +107,8 @@ public final class WoodSet {
 	@Nullable private final Block wallHangingSign;
 	@Nullable private final Item hangingSignItem;
 
-	@Nullable private final EntityType<? extends AbstractBoatEntity> boatEntityType;
-	@Nullable private final EntityType<? extends AbstractBoatEntity> chestBoatEntityType;
+	@Nullable private final EntityType<? extends AbstractBoat> boatEntityType;
+	@Nullable private final EntityType<? extends AbstractBoat> chestBoatEntityType;
 	@Nullable private Item boatItem;
 	@Nullable private Item chestBoatItem;
 
@@ -125,14 +127,14 @@ public final class WoodSet {
 
 		// ---- Signs ----
 		if (b.signs) {
-			Block standing = Blocks.register(blockKey("_sign"), s -> new SignBlock(this.woodType, s), signSettings(b.mapColor));
+			Block standing = Blocks.register(blockKey("_sign"), s -> new StandingSignBlock(this.woodType, s), signSettings(b.mapColor));
 			Block wall = Blocks.register(blockKey("_wall_sign"), s -> new WallSignBlock(this.woodType, s),
 					signSettings(copyLootTable(standing), b.mapColor));
 			this.sign = standing;
 			this.wallSign = wall;
-			this.signItem = Items.register(standing, (block, s) -> new SignItem(block, wall, s), new Item.Settings().maxCount(16));
-			BlockEntityType.SIGN.addSupportedBlock(standing);
-			BlockEntityType.SIGN.addSupportedBlock(wall);
+			this.signItem = registerBlockItem(standing, (block, s) -> new SignItem(block, wall, s), new Item.Properties().stacksTo(16));
+			BlockEntityType.SIGN.addValidBlock(standing);
+			BlockEntityType.SIGN.addValidBlock(wall);
 		} else {
 			this.sign = null;
 			this.wallSign = null;
@@ -141,14 +143,14 @@ public final class WoodSet {
 
 		// ---- Hanging signs ----
 		if (b.hangingSigns) {
-			Block ceiling = Blocks.register(blockKey("_hanging_sign"), s -> new HangingSignBlock(this.woodType, s), signSettings(hangingColor));
+			Block ceiling = Blocks.register(blockKey("_hanging_sign"), s -> new CeilingHangingSignBlock(this.woodType, s), signSettings(hangingColor));
 			Block wall = Blocks.register(blockKey("_wall_hanging_sign"), s -> new WallHangingSignBlock(this.woodType, s),
 					signSettings(copyLootTable(ceiling), hangingColor));
 			this.hangingSign = ceiling;
 			this.wallHangingSign = wall;
-			this.hangingSignItem = Items.register(ceiling, (block, s) -> new HangingSignItem(block, wall, s), new Item.Settings().maxCount(16));
-			BlockEntityType.HANGING_SIGN.addSupportedBlock(ceiling);
-			BlockEntityType.HANGING_SIGN.addSupportedBlock(wall);
+			this.hangingSignItem = registerBlockItem(ceiling, (block, s) -> new HangingSignItem(block, wall, s), new Item.Properties().stacksTo(16));
+			BlockEntityType.HANGING_SIGN.addValidBlock(ceiling);
+			BlockEntityType.HANGING_SIGN.addValidBlock(wall);
 		} else {
 			this.hangingSign = null;
 			this.wallHangingSign = null;
@@ -159,33 +161,33 @@ public final class WoodSet {
 		if (b.boats) {
 			String boatSuffix = raft ? "_raft" : "_boat";
 			String chestSuffix = raft ? "_chest_raft" : "_chest_boat";
-			RegistryKey<EntityType<?>> boatKey = RegistryKey.of(RegistryKeys.ENTITY_TYPE, id.withSuffixedPath(boatSuffix));
-			RegistryKey<EntityType<?>> chestKey = RegistryKey.of(RegistryKeys.ENTITY_TYPE, id.withSuffixedPath(chestSuffix));
+			ResourceKey<EntityType<?>> boatKey = ResourceKey.create(Registries.ENTITY_TYPE, id.withSuffix(boatSuffix));
+			ResourceKey<EntityType<?>> chestKey = ResourceKey.create(Registries.ENTITY_TYPE, id.withSuffix(chestSuffix));
 
 			Supplier<Item> boatItemSupplier = () -> this.boatItem;
 			Supplier<Item> chestItemSupplier = () -> this.chestBoatItem;
 
-			EntityType<? extends AbstractBoatEntity> boatType;
-			EntityType<? extends AbstractBoatEntity> chestType;
+			EntityType<? extends AbstractBoat> boatType;
+			EntityType<? extends AbstractBoat> chestType;
 			if (raft) {
-				boatType = Registry.register(Registries.ENTITY_TYPE, boatKey, boatBuilder(
-						EntityType.Builder.<RaftEntity>create((type, world) -> new RaftEntity(type, world, boatItemSupplier), SpawnGroup.MISC)).build(boatKey));
-				chestType = Registry.register(Registries.ENTITY_TYPE, chestKey, boatBuilder(
-						EntityType.Builder.<ChestRaftEntity>create((type, world) -> new ChestRaftEntity(type, world, chestItemSupplier), SpawnGroup.MISC)).build(chestKey));
+				boatType = Registry.register(BuiltInRegistries.ENTITY_TYPE, boatKey, boatBuilder(
+						EntityType.Builder.<Raft>of((type, world) -> new Raft(type, world, boatItemSupplier), MobCategory.MISC)).build(boatKey));
+				chestType = Registry.register(BuiltInRegistries.ENTITY_TYPE, chestKey, boatBuilder(
+						EntityType.Builder.<ChestRaft>of((type, world) -> new ChestRaft(type, world, chestItemSupplier), MobCategory.MISC)).build(chestKey));
 			} else {
-				boatType = Registry.register(Registries.ENTITY_TYPE, boatKey, boatBuilder(
-						EntityType.Builder.<BoatEntity>create((type, world) -> new BoatEntity(type, world, boatItemSupplier), SpawnGroup.MISC)).build(boatKey));
-				chestType = Registry.register(Registries.ENTITY_TYPE, chestKey, boatBuilder(
-						EntityType.Builder.<ChestBoatEntity>create((type, world) -> new ChestBoatEntity(type, world, chestItemSupplier), SpawnGroup.MISC)).build(chestKey));
+				boatType = Registry.register(BuiltInRegistries.ENTITY_TYPE, boatKey, boatBuilder(
+						EntityType.Builder.<Boat>of((type, world) -> new Boat(type, world, boatItemSupplier), MobCategory.MISC)).build(boatKey));
+				chestType = Registry.register(BuiltInRegistries.ENTITY_TYPE, chestKey, boatBuilder(
+						EntityType.Builder.<ChestBoat>of((type, world) -> new ChestBoat(type, world, chestItemSupplier), MobCategory.MISC)).build(chestKey));
 			}
 			this.boatEntityType = boatType;
 			this.chestBoatEntityType = chestType;
 
-			this.boatItem = Items.register(itemKey(boatSuffix), s -> new BoatItem(boatType, s), new Item.Settings().maxCount(1));
-			this.chestBoatItem = Items.register(itemKey(chestSuffix), s -> new BoatItem(chestType, s), new Item.Settings().maxCount(1));
+			this.boatItem = registerItem(itemKey(boatSuffix), s -> new BoatItem(boatType, s), new Item.Properties().stacksTo(1));
+			this.chestBoatItem = registerItem(itemKey(chestSuffix), s -> new BoatItem(chestType, s), new Item.Properties().stacksTo(1));
 
-			DispenserBlock.registerBehavior(this.boatItem, new BoatDispenserBehavior(boatType));
-			DispenserBlock.registerBehavior(this.chestBoatItem, new BoatDispenserBehavior(chestType));
+			DispenserBlock.registerBehavior(this.boatItem, new BoatDispenseItemBehavior(boatType));
+			DispenserBlock.registerBehavior(this.chestBoatItem, new BoatDispenseItemBehavior(chestType));
 		} else {
 			this.boatEntityType = null;
 			this.chestBoatEntityType = null;
@@ -193,18 +195,18 @@ public final class WoodSet {
 
 		// ---- Shelf ----
 		if (b.shelf) {
-			AbstractBlock.Settings settings = AbstractBlock.Settings.create()
+			BlockBehaviour.Properties settings = BlockBehaviour.Properties.of()
 					.mapColor(b.mapColor)
 					.instrument(NoteBlockInstrument.BASS)
-					.sounds(BlockSoundGroup.SHELF)
+					.sound(SoundType.SHELF)
 					.strength(2.0F, 3.0F);
 			if (flammable) {
-				settings.burnable();
+				settings.ignitedByLava();
 			}
 			Block shelfBlock = Blocks.register(blockKey("_shelf"), ShelfBlock::new, settings);
 			this.shelf = shelfBlock;
-			this.shelfItem = Items.register(shelfBlock, s -> s.component(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT));
-			BlockEntityType.SHELF.addSupportedBlock(shelfBlock);
+			this.shelfItem = registerBlockItem(shelfBlock, BlockItem::new, new Item.Properties().component(DataComponents.CONTAINER, ItemContainerContents.EMPTY));
+			BlockEntityType.SHELF.addValidBlock(shelfBlock);
 			if (flammable) {
 				FlammableBlockRegistry.getDefaultInstance().add(shelfBlock, 30, 20);
 			}
@@ -215,15 +217,15 @@ public final class WoodSet {
 
 		// ---- Creative tabs ----
 		if (b.addToCreativeTabs) {
-			ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
-				if (signItem != null) entries.add(signItem);
-				if (hangingSignItem != null) entries.add(hangingSignItem);
-				if (shelfItem != null) entries.add(shelfItem);
+			CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> {
+				if (signItem != null) entries.accept(signItem);
+				if (hangingSignItem != null) entries.accept(hangingSignItem);
+				if (shelfItem != null) entries.accept(shelfItem);
 			});
 			if (boatItem != null) {
-				ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> {
-					entries.add(boatItem);
-					entries.add(chestBoatItem);
+				CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {
+					entries.accept(boatItem);
+					entries.accept(chestBoatItem);
 				});
 			}
 		}
@@ -313,11 +315,11 @@ public final class WoodSet {
 		return require(hangingSignItem, "hangingSigns");
 	}
 
-	public EntityType<? extends AbstractBoatEntity> getBoatEntityType() {
+	public EntityType<? extends AbstractBoat> getBoatEntityType() {
 		return require(boatEntityType, "boats");
 	}
 
-	public EntityType<? extends AbstractBoatEntity> getChestBoatEntityType() {
+	public EntityType<? extends AbstractBoat> getChestBoatEntityType() {
 		return require(chestBoatEntityType, "boats");
 	}
 
@@ -353,35 +355,50 @@ public final class WoodSet {
 		return value;
 	}
 
-	private RegistryKey<Block> blockKey(String suffix) {
-		return RegistryKey.of(RegistryKeys.BLOCK, id.withSuffixedPath(suffix));
+	private ResourceKey<Block> blockKey(String suffix) {
+		return ResourceKey.create(Registries.BLOCK, id.withSuffix(suffix));
 	}
 
-	private RegistryKey<Item> itemKey(String suffix) {
-		return RegistryKey.of(RegistryKeys.ITEM, id.withSuffixedPath(suffix));
+	private ResourceKey<Item> itemKey(String suffix) {
+		return ResourceKey.create(Registries.ITEM, id.withSuffix(suffix));
 	}
 
-	private AbstractBlock.Settings signSettings(MapColor color) {
-		return signSettings(AbstractBlock.Settings.create(), color);
+	/** Same as vanilla's (private) {@code Items.registerItem}. */
+	private static Item registerItem(ResourceKey<Item> key, Function<Item.Properties, Item> factory, Item.Properties properties) {
+		Item item = factory.apply(properties.setId(key));
+		if (item instanceof BlockItem blockItem) {
+			blockItem.registerBlocks(Item.BY_BLOCK, item);
+		}
+		return Registry.register(BuiltInRegistries.ITEM, key, item);
 	}
 
-	private AbstractBlock.Settings signSettings(AbstractBlock.Settings settings, MapColor color) {
-		settings.mapColor(color).solid().instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0F);
+	/** Same as vanilla's (private) {@code Items.registerBlock}: the item gets the block's id and name. */
+	private static Item registerBlockItem(Block block, BiFunction<Block, Item.Properties, Item> factory, Item.Properties properties) {
+		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, block.builtInRegistryHolder().key().identifier());
+		return registerItem(key, s -> factory.apply(block, s), properties.useBlockDescriptionPrefix().requiredFeatures(block.requiredFeatures()));
+	}
+
+	private BlockBehaviour.Properties signSettings(MapColor color) {
+		return signSettings(BlockBehaviour.Properties.of(), color);
+	}
+
+	private BlockBehaviour.Properties signSettings(BlockBehaviour.Properties settings, MapColor color) {
+		settings.mapColor(color).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0F);
 		if (flammable) {
-			settings.burnable();
+			settings.ignitedByLava();
 		}
 		return settings;
 	}
 
 	/** Same as vanilla: wall variants drop the standing item and share its name. */
-	private static AbstractBlock.Settings copyLootTable(Block block) {
-		return AbstractBlock.Settings.create()
-				.lootTable(block.getLootTableKey())
-				.overrideTranslationKey(block.getTranslationKey());
+	private static BlockBehaviour.Properties copyLootTable(Block block) {
+		return BlockBehaviour.Properties.of()
+				.overrideLootTable(block.getLootTable())
+				.overrideDescription(block.getDescriptionId());
 	}
 
-	private static <T extends AbstractBoatEntity> EntityType.Builder<T> boatBuilder(EntityType.Builder<T> builder) {
-		return builder.dropsNothing().dimensions(1.375F, 0.5625F).eyeHeight(0.5625F).maxTrackingRange(10);
+	private static <T extends AbstractBoat> EntityType.Builder<T> boatBuilder(EntityType.Builder<T> builder) {
+		return builder.noLootTable().sized(1.375F, 0.5625F).eyeHeight(0.5625F).clientTrackingRange(10);
 	}
 
 	// ------------------------------------------------------------------------------------------
@@ -390,7 +407,7 @@ public final class WoodSet {
 
 	public static final class Builder {
 		private final Identifier id;
-		private MapColor mapColor = MapColor.OAK_TAN;
+		private MapColor mapColor = MapColor.WOOD;
 		@Nullable private MapColor hangingSignMapColor;
 		@Nullable private WoodType woodType;
 		private WoodTypeBuilder woodTypeBuilder = new WoodTypeBuilder();

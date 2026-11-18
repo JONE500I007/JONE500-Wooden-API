@@ -20,9 +20,9 @@ public class WoodenClientGameTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
 		try (TestSingleplayerContext world = context.worldBuilder().create()) {
-			world.getClientWorld().waitForChunksRender();
+			world.getClientLevel().waitForChunksRender();
 			buildScene(world.getServer());
-			world.getClientWorld().waitForChunksRender();
+			world.getClientLevel().waitForChunksRender();
 			context.waitTicks(40);
 			context.takeScreenshot("wooden_api_world");
 		}
@@ -30,10 +30,10 @@ public class WoodenClientGameTest implements FabricClientGameTest {
 		try (TestDedicatedServerContext server = context.worldBuilder().createServer()) {
 			// Spawn is far from 0,0 on a fresh dedicated server; place things around the player instead.
 			try (TestServerConnection connection = server.connect()) {
-				connection.getClientWorld().waitForChunksRender();
+				connection.getClientLevel().waitForChunksRender();
 				server.runCommand("op @a");
 				buildScene(server);
-				connection.getClientWorld().waitForChunksRender();
+				connection.getClientLevel().waitForChunksRender();
 				context.waitTicks(40);
 				context.takeScreenshot("wooden_api_dedicated_server");
 			}

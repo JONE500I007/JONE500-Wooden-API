@@ -7,27 +7,27 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.minecraft.block.Block;
-import net.minecraft.client.data.BlockStateModelGenerator;
-import net.minecraft.client.data.ItemModelGenerator;
-import net.minecraft.client.data.Models;
-import net.minecraft.data.loottable.BlockLootTableGenerator;
-import net.minecraft.data.recipe.RecipeExporter;
-import net.minecraft.data.recipe.RecipeGenerator;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.EntityTypeTags;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.registry.tag.TagKey;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
 import net.wooden.api.wood.WoodSet;
 
 /**
@@ -49,15 +49,15 @@ import net.wooden.api.wood.WoodSet;
  * Call the {@code generate...} methods from the providers you already have:
  * <pre>{@code
  * // FabricModelProvider
- * public void generateBlockStateModels(BlockStateModelGenerator gen) { WoodenDatagen.generateBlockStateModels(gen, MAPLE); }
- * public void generateItemModels(ItemModelGenerator gen)             { WoodenDatagen.generateItemModels(gen, MAPLE); }
- * // FabricRecipeProvider -> RecipeGenerator#generate()
- * WoodenDatagen.generateRecipes(this, exporter, MAPLE);
- * // FabricBlockLootTableProvider#generate()
+ * public void generateBlockStateModels(BlockModelGenerators gen) { WoodenDatagen.generateBlockStateModels(gen, MAPLE); }
+ * public void generateItemModels(ItemModelGenerators gen)             { WoodenDatagen.generateItemModels(gen, MAPLE); }
+ * // FabricRecipeProvider -> RecipeProvider#buildRecipes()
+ * WoodenDatagen.generateRecipes(this, output, MAPLE);
+ * // FabricBlockLootSubProvider#generate()
  * WoodenDatagen.generateLootTables(this, MAPLE);
- * // FabricTagProvider.BlockTagProvider#configure()
+ * // FabricTagsProvider.BlockTagsProvider#addTags()
  * WoodenDatagen.generateBlockTags((tag, block) -> valueLookupBuilder(tag).add(block), MAPLE);
- * // FabricTagProvider.ItemTagProvider#configure()
+ * // FabricTagsProvider.ItemTagsProvider#addTags()
  * WoodenDatagen.generateItemTags((tag, item) -> valueLookupBuilder(tag).add(item), MAPLE);
  * // FabricLanguageProvider#generateTranslations()
  * WoodenDatagen.generateTranslations(builder, MAPLE, "Maple");
@@ -85,14 +85,14 @@ public final class WoodenDatagen {
 		List<WoodSet> list = List.copyOf(Arrays.asList(sets));
 		WoodSet[] array = list.toArray(WoodSet[]::new);
 
-		pack.addProvider((FabricDataOutput output) -> new FabricModelProvider(output) {
+		pack.addProvider((FabricPackOutput output) -> new FabricModelProvider(output) {
 			@Override
-			public void generateBlockStateModels(BlockStateModelGenerator gen) {
+			public void generateBlockStateModels(BlockModelGenerators gen) {
 				WoodenDatagen.generateBlockStateModels(gen, array);
 			}
 
 			@Override
-			public void generateItemModels(ItemModelGenerator gen) {
+			public void generateItemModels(ItemModelGenerators gen) {
 				WoodenDatagen.generateItemModels(gen, array);
 			}
 
@@ -102,13 +102,13 @@ public final class WoodenDatagen {
 			}
 		});
 
-		pack.addProvider((FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) -> new FabricRecipeProvider(output, registries) {
+		pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricRecipeProvider(output, registries) {
 			@Override
-			protected RecipeGenerator getRecipeGenerator(RegistryWrapper.WrapperLookup lookup, RecipeExporter exporter) {
-				return new RecipeGenerator(lookup, exporter) {
+			protected RecipeProvider createRecipeProvider(HolderLookup.Provider lookup, RecipeOutput exporter) {
+				return new RecipeProvider(lookup, exporter) {
 					@Override
-					public void generate() {
-						WoodenDatagen.generateRecipes(this, exporter, array);
+					public void buildRecipes() {
+						WoodenDatagen.generateRecipes(this, output, array);
 					}
 				};
 			}
@@ -119,7 +119,7 @@ public final class WoodenDatagen {
 			}
 		});
 
-		pack.addProvider((FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) -> new FabricBlockLootTableProvider(output, registries) {
+		pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricBlockLootSubProvider(output, registries) {
 			@Override
 			public void generate() {
 				WoodenDatagen.generateLootTables(this, array);
@@ -131,9 +131,9 @@ public final class WoodenDatagen {
 			}
 		});
 
-		pack.addProvider((FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) -> new FabricTagProvider.BlockTagProvider(output, registries) {
+		pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricTagsProvider.BlockTagsProvider(output, registries) {
 			@Override
-			protected void configure(RegistryWrapper.WrapperLookup lookup) {
+			protected void addTags(HolderLookup.Provider lookup) {
 				WoodenDatagen.generateBlockTags((tag, block) -> valueLookupBuilder(tag).add(block), array);
 			}
 
@@ -143,9 +143,9 @@ public final class WoodenDatagen {
 			}
 		});
 
-		pack.addProvider((FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) -> new FabricTagProvider.ItemTagProvider(output, registries) {
+		pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricTagsProvider.ItemTagsProvider(output, registries) {
 			@Override
-			protected void configure(RegistryWrapper.WrapperLookup lookup) {
+			protected void addTags(HolderLookup.Provider lookup) {
 				WoodenDatagen.generateItemTags((tag, item) -> valueLookupBuilder(tag).add(item), array);
 			}
 
@@ -155,9 +155,9 @@ public final class WoodenDatagen {
 			}
 		});
 
-		pack.addProvider((FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) -> new FabricTagProvider.EntityTypeTagProvider(output, registries) {
+		pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricTagsProvider.EntityTypeTagsProvider(output, registries) {
 			@Override
-			protected void configure(RegistryWrapper.WrapperLookup lookup) {
+			protected void addTags(HolderLookup.Provider lookup) {
 				WoodenDatagen.generateEntityTypeTags((tag, type) -> valueLookupBuilder(tag).add(type), array);
 			}
 
@@ -168,9 +168,9 @@ public final class WoodenDatagen {
 		});
 
 		if (includeEnglish) {
-			pack.addProvider((FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) -> new FabricLanguageProvider(output, registries) {
+			pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricLanguageProvider(output, registries) {
 				@Override
-				public void generateTranslations(RegistryWrapper.WrapperLookup lookup, TranslationBuilder builder) {
+				public void generateTranslations(HolderLookup.Provider lookup, TranslationBuilder builder) {
 					for (WoodSet set : array) {
 						WoodenDatagen.generateTranslations(builder, set);
 					}
@@ -192,66 +192,66 @@ public final class WoodenDatagen {
 	 * Blockstates + block models (and the sign/shelf item models).
 	 * Needs {@code planks} for signs and {@code strippedLog} for hanging signs and shelves.
 	 */
-	public static void generateBlockStateModels(BlockStateModelGenerator gen, WoodSet... sets) {
+	public static void generateBlockStateModels(BlockModelGenerators gen, WoodSet... sets) {
 		for (WoodSet set : sets) {
 			if (set.hasSigns()) {
 				// Signs only have a particle model. Vanilla's hanging sign helper does exactly what
 				// a sign needs (particle model from a texture block, same model for both blocks,
 				// flat item model), so it is reused with the planks as texture.
-				gen.registerHangingSign(planks(set), set.getSign(), set.getWallSign());
+				gen.createHangingSign(planks(set), set.getSign(), set.getWallSign());
 			}
 			if (set.hasHangingSigns()) {
-				gen.registerHangingSign(strippedLog(set), set.getHangingSign(), set.getWallHangingSign());
+				gen.createHangingSign(strippedLog(set), set.getHangingSign(), set.getWallHangingSign());
 			}
 			if (set.hasShelf()) {
-				gen.registerShelf(set.getShelf(), strippedLog(set));
+				gen.createShelf(set.getShelf(), strippedLog(set));
 			}
 		}
 	}
 
 	/** Item models for boats and chest boats (flat item texture {@code textures/item/<id>.png}). */
-	public static void generateItemModels(ItemModelGenerator gen, WoodSet... sets) {
+	public static void generateItemModels(ItemModelGenerators gen, WoodSet... sets) {
 		for (WoodSet set : sets) {
 			if (set.hasBoats()) {
-				gen.register(set.getBoatItem(), Models.GENERATED);
-				gen.register(set.getChestBoatItem(), Models.GENERATED);
+				gen.generateFlatItem(set.getBoatItem(), ModelTemplates.FLAT_ITEM);
+				gen.generateFlatItem(set.getChestBoatItem(), ModelTemplates.FLAT_ITEM);
 			}
 		}
 	}
 
 	/** Vanilla-style crafting recipes for everything in the sets. */
-	public static void generateRecipes(RecipeGenerator gen, RecipeExporter exporter, WoodSet... sets) {
+	public static void generateRecipes(RecipeProvider gen, RecipeOutput exporter, WoodSet... sets) {
 		for (WoodSet set : sets) {
 			if (set.hasSigns()) {
 				Block planks = planks(set);
-				gen.createSignRecipe(set.getSignItem(), Ingredient.ofItem(planks))
-						.criterion(RecipeGenerator.hasItem(planks), gen.conditionsFromItem(planks))
-						.offerTo(exporter);
+				gen.signBuilder(set.getSignItem(), Ingredient.of(planks))
+						.unlockedBy(RecipeProvider.getHasName(planks), gen.has(planks))
+						.save(exporter);
 			}
 			if (set.hasHangingSigns()) {
-				gen.offerHangingSignRecipe(set.getHangingSignItem(), strippedLog(set));
+				gen.hangingSign(set.getHangingSignItem(), strippedLog(set));
 			}
 			if (set.hasBoats()) {
-				gen.offerBoatRecipe(set.getBoatItem(), planks(set));
-				gen.offerChestBoatRecipe(set.getChestBoatItem(), set.getBoatItem());
+				gen.woodenBoat(set.getBoatItem(), planks(set));
+				gen.chestBoat(set.getChestBoatItem(), set.getBoatItem());
 			}
 			if (set.hasShelf()) {
-				gen.offerShelfRecipe(set.getShelfItem(), strippedLog(set));
+				gen.shelf(set.getShelfItem(), strippedLog(set));
 			}
 		}
 	}
 
 	/** Block loot tables (wall signs reuse the standing sign's table, like vanilla). */
-	public static void generateLootTables(BlockLootTableGenerator gen, WoodSet... sets) {
+	public static void generateLootTables(BlockLootSubProvider gen, WoodSet... sets) {
 		for (WoodSet set : sets) {
 			if (set.hasSigns()) {
-				gen.addDrop(set.getSign());
+				gen.dropSelf(set.getSign());
 			}
 			if (set.hasHangingSigns()) {
-				gen.addDrop(set.getHangingSign());
+				gen.dropSelf(set.getHangingSign());
 			}
 			if (set.hasShelf()) {
-				gen.addDrop(set.getShelf());
+				gen.dropSelf(set.getShelf());
 			}
 		}
 	}

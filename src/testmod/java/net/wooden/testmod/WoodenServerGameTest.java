@@ -1,19 +1,19 @@
 package net.wooden.testmod;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.WallHangingSignBlock;
-import net.minecraft.block.WallSignBlock;
-import net.minecraft.block.entity.HangingSignBlockEntity;
-import net.minecraft.block.entity.ShelfBlockEntity;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.WallHangingSignBlock;
+import net.minecraft.world.level.block.WallSignBlock;
+import net.minecraft.world.level.block.entity.HangingSignBlockEntity;
+import net.minecraft.world.level.block.entity.ShelfBlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 
 import static net.wooden.testmod.WoodenTestMod.MAPLE;
 
@@ -23,67 +23,67 @@ import static net.wooden.testmod.WoodenTestMod.MAPLE;
  */
 public class WoodenServerGameTest {
 	@GameTest(maxTicks = 100)
-	public void signsHaveBlockEntities(TestContext ctx) {
+	public void signsHaveBlockEntities(GameTestHelper ctx) {
 		BlockPos sign = new BlockPos(1, 1, 1);
-		ctx.setBlockState(sign, MAPLE.getSign());
-		ctx.assertTrue(ctx.getBlockEntity(sign, SignBlockEntity.class) != null, Text.literal("sign has no block entity"));
+		ctx.setBlock(sign, MAPLE.getSign());
+		ctx.assertTrue(ctx.getBlockEntity(sign, SignBlockEntity.class) != null, Component.literal("sign has no block entity"));
 
 		BlockPos wallSupport = new BlockPos(3, 1, 2);
 		BlockPos wallSign = new BlockPos(3, 1, 1);
-		ctx.setBlockState(wallSupport, Blocks.STONE);
-		ctx.setBlockState(wallSign, MAPLE.getWallSign().getDefaultState().with(WallSignBlock.FACING, Direction.NORTH));
-		ctx.assertTrue(ctx.getBlockEntity(wallSign, SignBlockEntity.class) != null, Text.literal("wall sign has no block entity"));
+		ctx.setBlock(wallSupport, Blocks.STONE);
+		ctx.setBlock(wallSign, MAPLE.getWallSign().defaultBlockState().setValue(WallSignBlock.FACING, Direction.NORTH));
+		ctx.assertTrue(ctx.getBlockEntity(wallSign, SignBlockEntity.class) != null, Component.literal("wall sign has no block entity"));
 
 		BlockPos hangingSupport = new BlockPos(5, 3, 1);
 		BlockPos hangingSign = new BlockPos(5, 2, 1);
-		ctx.setBlockState(hangingSupport, Blocks.STONE);
-		ctx.setBlockState(hangingSign, MAPLE.getHangingSign());
-		ctx.assertTrue(ctx.getBlockEntity(hangingSign, HangingSignBlockEntity.class) != null, Text.literal("hanging sign has no block entity"));
+		ctx.setBlock(hangingSupport, Blocks.STONE);
+		ctx.setBlock(hangingSign, MAPLE.getHangingSign());
+		ctx.assertTrue(ctx.getBlockEntity(hangingSign, HangingSignBlockEntity.class) != null, Component.literal("hanging sign has no block entity"));
 
 		BlockPos wallHangingSign = new BlockPos(1, 3, 4);
-		ctx.setBlockState(new BlockPos(0, 3, 4), Blocks.STONE);
-		ctx.setBlockState(wallHangingSign, MAPLE.getWallHangingSign().getDefaultState().with(WallHangingSignBlock.FACING, Direction.NORTH));
-		ctx.assertTrue(ctx.getBlockEntity(wallHangingSign, HangingSignBlockEntity.class) != null, Text.literal("wall hanging sign has no block entity"));
+		ctx.setBlock(new BlockPos(0, 3, 4), Blocks.STONE);
+		ctx.setBlock(wallHangingSign, MAPLE.getWallHangingSign().defaultBlockState().setValue(WallHangingSignBlock.FACING, Direction.NORTH));
+		ctx.assertTrue(ctx.getBlockEntity(wallHangingSign, HangingSignBlockEntity.class) != null, Component.literal("wall hanging sign has no block entity"));
 
 		// Let a few ticks pass so block updates run, then make sure nothing broke off.
-		ctx.waitAndRun(10, () -> {
-			ctx.expectBlock(MAPLE.getSign(), sign);
-			ctx.expectBlock(MAPLE.getWallSign(), wallSign);
-			ctx.expectBlock(MAPLE.getHangingSign(), hangingSign);
-			ctx.expectBlock(MAPLE.getWallHangingSign(), wallHangingSign);
-			ctx.complete();
+		ctx.runAfterDelay(10, () -> {
+			ctx.assertBlockPresent(MAPLE.getSign(), sign);
+			ctx.assertBlockPresent(MAPLE.getWallSign(), wallSign);
+			ctx.assertBlockPresent(MAPLE.getHangingSign(), hangingSign);
+			ctx.assertBlockPresent(MAPLE.getWallHangingSign(), wallHangingSign);
+			ctx.succeed();
 		});
 	}
 
 	@GameTest(maxTicks = 100)
-	public void shelfStoresItems(TestContext ctx) {
+	public void shelfStoresItems(GameTestHelper ctx) {
 		BlockPos pos = new BlockPos(2, 1, 2);
-		ctx.setBlockState(pos, MAPLE.getShelf());
+		ctx.setBlock(pos, MAPLE.getShelf());
 		ShelfBlockEntity shelf = ctx.getBlockEntity(pos, ShelfBlockEntity.class);
-		ctx.assertTrue(shelf != null, Text.literal("shelf has no block entity"));
-		shelf.setStack(0, new ItemStack(Items.DIAMOND));
+		ctx.assertTrue(shelf != null, Component.literal("shelf has no block entity"));
+		shelf.setItem(0, new ItemStack(Items.DIAMOND));
 
-		ctx.waitAndRun(5, () -> {
+		ctx.runAfterDelay(5, () -> {
 			ShelfBlockEntity again = ctx.getBlockEntity(pos, ShelfBlockEntity.class);
-			ctx.assertTrue(again.getStack(0).isOf(Items.DIAMOND), Text.literal("shelf lost its item"));
-			ctx.complete();
+			ctx.assertTrue(again.getItem(0).is(Items.DIAMOND), Component.literal("shelf lost its item"));
+			ctx.succeed();
 		});
 	}
 
 	@GameTest(maxTicks = 100)
-	public void boatsSpawnAndTick(TestContext ctx) {
-		Entity boat = ctx.spawnEntity(MAPLE.getBoatEntityType(), new BlockPos(2, 1, 2));
-		Entity chestBoat = ctx.spawnEntity(MAPLE.getChestBoatEntityType(), new BlockPos(5, 1, 5));
-		ctx.assertTrue(boat.getType() == MAPLE.getBoatEntityType(), Text.literal("wrong boat type"));
-		ctx.assertTrue(chestBoat.getType() == MAPLE.getChestBoatEntityType(), Text.literal("wrong chest boat type"));
-		ctx.assertTrue(boat.getPickBlockStack().isOf(MAPLE.getBoatItem()), Text.literal("boat does not give the maple boat item"));
-		ctx.assertTrue(chestBoat.getPickBlockStack().isOf(MAPLE.getChestBoatItem()), Text.literal("chest boat does not give the maple chest boat item"));
+	public void boatsSpawnAndTick(GameTestHelper ctx) {
+		Entity boat = ctx.spawn(MAPLE.getBoatEntityType(), new BlockPos(2, 1, 2));
+		Entity chestBoat = ctx.spawn(MAPLE.getChestBoatEntityType(), new BlockPos(5, 1, 5));
+		ctx.assertTrue(boat.getType() == MAPLE.getBoatEntityType(), Component.literal("wrong boat type"));
+		ctx.assertTrue(chestBoat.getType() == MAPLE.getChestBoatEntityType(), Component.literal("wrong chest boat type"));
+		ctx.assertTrue(boat.getPickResult().is(MAPLE.getBoatItem()), Component.literal("boat does not give the maple boat item"));
+		ctx.assertTrue(chestBoat.getPickResult().is(MAPLE.getChestBoatItem()), Component.literal("chest boat does not give the maple chest boat item"));
 
 		// Tick for a while to make sure nothing crashes on the server.
-		ctx.waitAndRun(40, () -> {
-			ctx.expectEntity(MAPLE.getBoatEntityType());
-			ctx.expectEntity(MAPLE.getChestBoatEntityType());
-			ctx.complete();
+		ctx.runAfterDelay(40, () -> {
+			ctx.assertEntityPresent(MAPLE.getBoatEntityType());
+			ctx.assertEntityPresent(MAPLE.getChestBoatEntityType());
+			ctx.succeed();
 		});
 	}
 }

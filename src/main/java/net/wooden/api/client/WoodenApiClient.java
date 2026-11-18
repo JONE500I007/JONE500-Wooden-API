@@ -1,13 +1,13 @@
 package net.wooden.api.client;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.minecraft.client.render.entity.BoatEntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactories;
-import net.minecraft.client.render.entity.RaftEntityRenderer;
-import net.minecraft.client.render.entity.model.BoatEntityModel;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.client.render.entity.model.RaftEntityModel;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.object.boat.BoatModel;
+import net.minecraft.client.model.object.boat.RaftModel;
+import net.minecraft.client.renderer.entity.BoatRenderer;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.RaftRenderer;
 import net.wooden.api.wood.WoodSet;
 
 /**
@@ -30,29 +30,29 @@ public class WoodenApiClient implements ClientModInitializer {
 	}
 
 	/** Model layer {@code <namespace>:boat/<wood>} -> texture {@code textures/entity/boat/<wood>.png}. */
-	public static EntityModelLayer boatLayer(WoodSet set) {
-		return new EntityModelLayer(set.getId().withPrefixedPath("boat/"), "main");
+	public static ModelLayerLocation boatLayer(WoodSet set) {
+		return new ModelLayerLocation(set.getId().withPrefix("boat/"), "main");
 	}
 
 	/** Model layer {@code <namespace>:chest_boat/<wood>} -> texture {@code textures/entity/chest_boat/<wood>.png}. */
-	public static EntityModelLayer chestBoatLayer(WoodSet set) {
-		return new EntityModelLayer(set.getId().withPrefixedPath("chest_boat/"), "main");
+	public static ModelLayerLocation chestBoatLayer(WoodSet set) {
+		return new ModelLayerLocation(set.getId().withPrefix("chest_boat/"), "main");
 	}
 
 	private static void registerBoat(WoodSet set) {
-		EntityModelLayer boat = boatLayer(set);
-		EntityModelLayer chestBoat = chestBoatLayer(set);
+		ModelLayerLocation boat = boatLayer(set);
+		ModelLayerLocation chestBoat = chestBoatLayer(set);
 
 		if (set.isRaft()) {
-			EntityModelLayerRegistry.registerModelLayer(boat, RaftEntityModel::getTexturedModelData);
-			EntityModelLayerRegistry.registerModelLayer(chestBoat, RaftEntityModel::getChestTexturedModelData);
-			EntityRendererFactories.register(set.getBoatEntityType(), ctx -> new RaftEntityRenderer(ctx, boat));
-			EntityRendererFactories.register(set.getChestBoatEntityType(), ctx -> new RaftEntityRenderer(ctx, chestBoat));
+			ModelLayerRegistry.registerModelLayer(boat, RaftModel::createRaftModel);
+			ModelLayerRegistry.registerModelLayer(chestBoat, RaftModel::createChestRaftModel);
+			EntityRenderers.register(set.getBoatEntityType(), ctx -> new RaftRenderer(ctx, boat));
+			EntityRenderers.register(set.getChestBoatEntityType(), ctx -> new RaftRenderer(ctx, chestBoat));
 		} else {
-			EntityModelLayerRegistry.registerModelLayer(boat, BoatEntityModel::getTexturedModelData);
-			EntityModelLayerRegistry.registerModelLayer(chestBoat, BoatEntityModel::getChestTexturedModelData);
-			EntityRendererFactories.register(set.getBoatEntityType(), ctx -> new BoatEntityRenderer(ctx, boat));
-			EntityRendererFactories.register(set.getChestBoatEntityType(), ctx -> new BoatEntityRenderer(ctx, chestBoat));
+			ModelLayerRegistry.registerModelLayer(boat, BoatModel::createBoatModel);
+			ModelLayerRegistry.registerModelLayer(chestBoat, BoatModel::createChestBoatModel);
+			EntityRenderers.register(set.getBoatEntityType(), ctx -> new BoatRenderer(ctx, boat));
+			EntityRenderers.register(set.getChestBoatEntityType(), ctx -> new BoatRenderer(ctx, chestBoat));
 		}
 	}
 }

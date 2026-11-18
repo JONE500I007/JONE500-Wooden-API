@@ -1,9 +1,9 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
-// Version = mod version + Minecraft version, e.g. 1.0.0+1.21.11, so the builds for different
+// Version = mod version + Minecraft version, e.g. 1.0.0+26.1, so the builds for different
 // Minecraft versions never share a version number (on Modrinth or in the jar name).
 version = "${project.mod_version}+${project.minecraft_version}"
 
@@ -96,11 +96,10 @@ tasks.named("runClientGameTest") {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API is required by Wooden API.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 processResources {
@@ -122,15 +121,15 @@ processTestmodResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
 	// Publishes a -sources.jar next to the main jar so modders can read the API code in their IDE.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
@@ -144,7 +143,7 @@ jar {
 
 // ---------------------------------------------------------------------------
 // Maven publishing: lets other modders write
-//   modImplementation "net.wooden.api:jone500-wooden-api:1.0.0+1.21.11"
+//   implementation "net.wooden.api:jone500-wooden-api:1.0.0+26.1"
 // Run `gradlew publishToMavenLocal` to test it on your own computer.
 // ---------------------------------------------------------------------------
 publishing {

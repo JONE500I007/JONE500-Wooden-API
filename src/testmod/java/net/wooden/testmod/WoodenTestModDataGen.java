@@ -5,16 +5,15 @@ import java.util.concurrent.CompletableFuture;
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.minecraft.client.data.BlockStateModelGenerator;
-import net.minecraft.client.data.ItemModelGenerator;
-import net.minecraft.data.recipe.RecipeExporter;
-import net.minecraft.data.recipe.RecipeGenerator;
-import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.wooden.api.datagen.WoodenDatagen;
 
 import static net.wooden.testmod.WoodenTestMod.MAPLE;
@@ -38,48 +37,48 @@ public class WoodenTestModDataGen implements DataGeneratorEntrypoint {
 	}
 
 	private static class ModelProvider extends FabricModelProvider {
-		ModelProvider(FabricDataOutput output) {
+		ModelProvider(FabricPackOutput output) {
 			super(output);
 		}
 
 		@Override
-		public void generateBlockStateModels(BlockStateModelGenerator gen) {
-			gen.registerSimpleCubeAll(MAPLE_PLANKS);
-			gen.createLogTexturePool(STRIPPED_MAPLE_LOG).log(STRIPPED_MAPLE_LOG);
+		public void generateBlockStateModels(BlockModelGenerators gen) {
+			gen.createTrivialCube(MAPLE_PLANKS);
+			gen.woodProvider(STRIPPED_MAPLE_LOG).logWithHorizontal(STRIPPED_MAPLE_LOG);
 		}
 
 		@Override
-		public void generateItemModels(ItemModelGenerator gen) {
+		public void generateItemModels(ItemModelGenerators gen) {
 		}
 	}
 
-	private static class LootProvider extends FabricBlockLootTableProvider {
-		LootProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) {
+	private static class LootProvider extends FabricBlockLootSubProvider {
+		LootProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
 			super(output, registries);
 		}
 
 		@Override
 		public void generate() {
-			addDrop(MAPLE_PLANKS);
-			addDrop(STRIPPED_MAPLE_LOG);
+			dropSelf(MAPLE_PLANKS);
+			dropSelf(STRIPPED_MAPLE_LOG);
 		}
 	}
 
 	private static class RecipeProvider extends FabricRecipeProvider {
-		RecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) {
+		RecipeProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
 			super(output, registries);
 		}
 
 		@Override
-		protected RecipeGenerator getRecipeGenerator(RegistryWrapper.WrapperLookup lookup, RecipeExporter exporter) {
-			return new RecipeGenerator(lookup, exporter) {
+		protected net.minecraft.data.recipes.RecipeProvider createRecipeProvider(HolderLookup.Provider lookup, RecipeOutput exporter) {
+			return new net.minecraft.data.recipes.RecipeProvider(lookup, exporter) {
 				@Override
-				public void generate() {
-					createShapeless(RecipeCategory.BUILDING_BLOCKS, MAPLE_PLANKS, 4)
-							.input(STRIPPED_MAPLE_LOG)
+				public void buildRecipes() {
+					shapeless(RecipeCategory.BUILDING_BLOCKS, MAPLE_PLANKS, 4)
+							.requires(STRIPPED_MAPLE_LOG)
 							.group("planks")
-							.criterion(hasItem(STRIPPED_MAPLE_LOG), conditionsFromItem(STRIPPED_MAPLE_LOG))
-							.offerTo(exporter);
+							.unlockedBy(getHasName(STRIPPED_MAPLE_LOG), has(STRIPPED_MAPLE_LOG))
+							.save(output);
 				}
 			};
 		}
@@ -91,12 +90,12 @@ public class WoodenTestModDataGen implements DataGeneratorEntrypoint {
 	}
 
 	private static class EnglishProvider extends FabricLanguageProvider {
-		EnglishProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registries) {
+		EnglishProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
 			super(output, registries);
 		}
 
 		@Override
-		public void generateTranslations(RegistryWrapper.WrapperLookup lookup, TranslationBuilder builder) {
+		public void generateTranslations(HolderLookup.Provider lookup, TranslationBuilder builder) {
 			builder.add(MAPLE_PLANKS, "Maple Planks");
 			builder.add(STRIPPED_MAPLE_LOG, "Stripped Maple Log");
 			WoodenDatagen.generateTranslations(builder, MAPLE, "Maple");
