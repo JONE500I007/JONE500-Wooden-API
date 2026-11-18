@@ -31,9 +31,9 @@ artifact (`maven.modrinth:jone500-wooden-api:<version>`).
 2. Run `gradlew runGameTest` and `gradlew runClientGameTest`, and look at the screenshots.
 3. Run `gradlew build`.
 4. On Modrinth, create a new version of the `jone500-wooden-api` project with the **same version number**
-   as the jar (e.g. `1.0.1+26.2`), tick the matching game version, and upload
+   as the jar (e.g. `1.0.1+26.3`), tick the matching game version, and upload
    `build/libs/jone500-wooden-api-<version>.jar` as the primary file.
-5. Do the same on every Minecraft branch (`1.21.9`, `1.21.10`, `1.21.11`, `26.1`, `26.2`, ...).
+5. Do the same on every Minecraft branch (`1.21.9`, `1.21.10`, `1.21.11`, `26.1`, `26.2`, `26.3`, ...).
 
 The full version number is `<mod_version>+<minecraft_version>`. `build.gradle` puts it together, so
 you only ever edit `mod_version`; the jar name and `fabric.mod.json` get the full number
@@ -69,10 +69,10 @@ own build:
 2. Fix compile errors. Then run `gradlew runDatagen`, `gradlew runGameTest` and
    `gradlew runClientGameTest`, and open the images in `build/run/clientGameTest/screenshots` to
    make sure the signs, boats and shelf still look right.
-3. The Minecraft part of the version number (`+26.2`) comes from `minecraft_version`, so it
+3. The Minecraft part of the version number (`+26.3`) comes from `minecraft_version`, so it
    changes by itself. Each Minecraft version lives on its own git branch
-   (`1.21.9`, `1.21.10`, `1.21.11`, `26.1`, `26.2`, ...).
-4. Update the Minecraft version in the README examples (`1.0.0+26.2`, the Minecraft jar path).
+   (`1.21.9`, `1.21.10`, `1.21.11`, `26.1`, `26.2`, `26.3`, ...).
+4. Update the Minecraft version in the README examples (`1.0.0+26.3`, the Minecraft jar path).
 
 ### 1.21.x branches vs 26.x branches
 

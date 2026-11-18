@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wooden_test:maple_planks"
+        "recipes": "wooden_test:maple_planks"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

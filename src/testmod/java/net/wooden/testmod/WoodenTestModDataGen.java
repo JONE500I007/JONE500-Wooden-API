@@ -11,7 +11,10 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.wooden.api.datagen.WoodenDatagen;
@@ -70,8 +73,8 @@ public class WoodenTestModDataGen implements DataGeneratorEntrypoint {
 		}
 
 		@Override
-		protected net.minecraft.data.recipes.RecipeProvider createRecipeProvider(HolderLookup.Provider lookup, RecipeOutput exporter) {
-			return new net.minecraft.data.recipes.RecipeProvider(lookup, exporter) {
+		protected net.minecraft.data.recipes.RecipeProvider createRecipeProvider(HolderLookup.Provider lookup, BootstrapContext<Recipe<?>> recipes, BootstrapContext<Advancement> advancements) {
+			return new net.minecraft.data.recipes.RecipeProvider(recipes, advancements) {
 				@Override
 				public void buildRecipes() {
 					shapeless(RecipeCategory.BUILDING_BLOCKS, MAPLE_PLANKS, 4)

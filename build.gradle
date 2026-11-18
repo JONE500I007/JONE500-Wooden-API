@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-// Version = mod version + Minecraft version, e.g. 1.0.0+26.2, so the builds for different
+// Version = mod version + Minecraft version, e.g. 1.0.0+26.3, so the builds for different
 // Minecraft versions never share a version number (on Modrinth or in the jar name).
 version = "${project.mod_version}+${project.minecraft_version}"
 
@@ -143,7 +143,7 @@ jar {
 
 // ---------------------------------------------------------------------------
 // Maven publishing: lets other modders write
-//   implementation "net.wooden.api:jone500-wooden-api:1.0.0+26.2"
+//   implementation "net.wooden.api:jone500-wooden-api:1.0.0+26.3"
 // Run `gradlew publishToMavenLocal` to test it on your own computer.
 // ---------------------------------------------------------------------------
 publishing {

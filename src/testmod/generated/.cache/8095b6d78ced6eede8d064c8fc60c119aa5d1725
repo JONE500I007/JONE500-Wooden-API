@@ -1,4 +1,4 @@
-// 26.2	-999999999-01-01T00:00:00	Wooden API Test Mod/Wooden API Block Loot Tables
-11900972c8dfa3f7280bdc941aa414bea621fd4e data/wooden_test/loot_table/blocks/maple_hanging_sign.json
-847f5ce057cf7f73dbd8d41f8e7b5b99b3b92b05 data/wooden_test/loot_table/blocks/maple_shelf.json
-6d6e43d78a0c1ab28b476b331f123b0732aea10c data/wooden_test/loot_table/blocks/maple_sign.json
+// 26.3	-999999999-01-01T00:00:00	Wooden API Test Mod/Wooden API Block Loot Tables
+f9adf1abb455c98d5eca3c43cdc0c95dfc3b641e data/wooden_test/loot_table/blocks/maple_hanging_sign.json
+f68095febb6afdbc864036c9fdee3c12473c4608 data/wooden_test/loot_table/blocks/maple_shelf.json
+4b30666bfcf3b5165b71c6e023069c8935dab4db data/wooden_test/loot_table/blocks/maple_sign.json

@@ -1,9 +1,9 @@
-// 26.2	-999999999-01-01T00:00:00	Wooden API Test Mod/Wooden API Recipes
-bb3df736ed0fbef1f1ab84826ce0aadcd575b655 data/wooden_test/advancement/recipes/decorations/maple_hanging_sign.json
-fb76e764684648c23359f123ce6411cfbfea4a4d data/wooden_test/advancement/recipes/decorations/maple_shelf.json
-dc96b950681ae03800e04e72d75cc6826824828b data/wooden_test/advancement/recipes/decorations/maple_sign.json
-f7433dc8ed6a5fafa6381448e0980819c4746671 data/wooden_test/advancement/recipes/transportation/maple_boat.json
-f0474b6518ce350d07e887a89ab19810beab9e35 data/wooden_test/advancement/recipes/transportation/maple_chest_boat.json
+// 26.3	-999999999-01-01T00:00:00	Wooden API Test Mod/Wooden API Recipes
+e53dee955990503e8b88ad0270c3068a7b18903e data/wooden_test/advancement/recipes/decorations/maple_hanging_sign.json
+a967de47795f9f6a9908edd66414e42b2f8178ef data/wooden_test/advancement/recipes/decorations/maple_shelf.json
+ba0a7392bb6e1c1f7fd13abbe24b1da3dcd1b6cd data/wooden_test/advancement/recipes/decorations/maple_sign.json
+98d08653cfd984e6d12be8041a631382ef452d83 data/wooden_test/advancement/recipes/transportation/maple_boat.json
+e1989cb2808b916e190ab09d0be7ffa79677f960 data/wooden_test/advancement/recipes/transportation/maple_chest_boat.json
 fb0a78603156cd2f6831af6971ea315d31bb9dda data/wooden_test/recipe/maple_boat.json
 e07e3602d760754b6606c4c8dfaed26606ad9d9a data/wooden_test/recipe/maple_chest_boat.json
 4062b031cfd5cdd89d89d60b503562df2b658b4c data/wooden_test/recipe/maple_hanging_sign.json

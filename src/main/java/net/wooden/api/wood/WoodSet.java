@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.dispenser.BoatDispenseItemBehavior;
@@ -34,7 +35,9 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.HangingSignItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.SignItem;
+import net.minecraft.world.item.StandingAndWallBlockItem;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -132,7 +135,8 @@ public final class WoodSet {
 					signSettings(copyLootTable(standing), b.mapColor));
 			this.sign = standing;
 			this.wallSign = wall;
-			this.signItem = registerBlockItem(standing, (block, s) -> new SignItem(block, wall, s), new Item.Properties().stacksTo(16));
+			this.signItem = registerBlockItem(standing, (block, s) -> new StandingAndWallBlockItem(block, wall, Direction.DOWN, s),
+					fuel(new Item.Properties().stacksTo(16).signText(), ContextIntProviders.COOKING_TIME_WOOD_ITEMS_LARGE));
 			BlockEntityTypes.SIGN.addValidBlock(standing);
 			BlockEntityTypes.SIGN.addValidBlock(wall);
 		} else {
@@ -148,7 +152,8 @@ public final class WoodSet {
 					signSettings(copyLootTable(ceiling), hangingColor));
 			this.hangingSign = ceiling;
 			this.wallHangingSign = wall;
-			this.hangingSignItem = registerBlockItem(ceiling, (block, s) -> new HangingSignItem(block, wall, s), new Item.Properties().stacksTo(16));
+			this.hangingSignItem = registerBlockItem(ceiling, (block, s) -> new HangingSignItem(block, wall, s),
+					fuel(new Item.Properties().stacksTo(16).signText(), ContextIntProviders.COOKING_TIME_HANGING_SIGNS));
 			BlockEntityTypes.HANGING_SIGN.addValidBlock(ceiling);
 			BlockEntityTypes.HANGING_SIGN.addValidBlock(wall);
 		} else {
@@ -183,8 +188,8 @@ public final class WoodSet {
 			this.boatEntityType = boatType;
 			this.chestBoatEntityType = chestType;
 
-			this.boatItem = registerItem(itemKey(boatSuffix), s -> new BoatItem(boatType, s), new Item.Properties().stacksTo(1));
-			this.chestBoatItem = registerItem(itemKey(chestSuffix), s -> new BoatItem(chestType, s), new Item.Properties().stacksTo(1));
+			this.boatItem = registerItem(itemKey(boatSuffix), s -> new BoatItem(boatType, s), fuel(new Item.Properties().stacksTo(1), ContextIntProviders.COOKING_TIME_BOATS));
+			this.chestBoatItem = registerItem(itemKey(chestSuffix), s -> new BoatItem(chestType, s), fuel(new Item.Properties().stacksTo(1), ContextIntProviders.COOKING_TIME_BOATS));
 
 			DispenserBlock.registerBehavior(this.boatItem, new BoatDispenseItemBehavior(boatType));
 			DispenserBlock.registerBehavior(this.chestBoatItem, new BoatDispenseItemBehavior(chestType));
@@ -205,7 +210,8 @@ public final class WoodSet {
 			}
 			Block shelfBlock = Blocks.register(blockKey("_shelf"), ShelfBlock::new, settings);
 			this.shelf = shelfBlock;
-			this.shelfItem = registerBlockItem(shelfBlock, BlockItem::new, new Item.Properties().component(DataComponents.CONTAINER, ItemContainerContents.EMPTY));
+			this.shelfItem = registerBlockItem(shelfBlock, BlockItem::new,
+					fuel(new Item.Properties().component(DataComponents.CONTAINER, ItemContainerContents.EMPTY), ContextIntProviders.COOKING_TIME_WOOD_BLOCKS));
 			BlockEntityTypes.SHELF.addValidBlock(shelfBlock);
 			if (flammable) {
 				FlammableBlockRegistry.getDefaultInstance().add(shelfBlock, 30, 20);
@@ -361,6 +367,11 @@ public final class WoodSet {
 
 	private ResourceKey<Item> itemKey(String suffix) {
 		return ResourceKey.create(Registries.ITEM, id.withSuffix(suffix));
+	}
+
+	/** Since 26.3 furnace fuel is an item component. Like vanilla, non-flammable wood is not fuel. */
+	private Item.Properties fuel(Item.Properties properties, ResourceKey<ContextIntProvider> burnTime) {
+		return flammable ? properties.cookingFuel(burnTime) : properties;
 	}
 
 	/** Same as vanilla's (private) {@code Items.registerItem}. */

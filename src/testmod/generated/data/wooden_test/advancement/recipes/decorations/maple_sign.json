@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wooden_test:maple_sign"
+        "recipes": "wooden_test:maple_sign"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
