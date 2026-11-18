@@ -23,18 +23,18 @@ Each Minecraft version has its own Wooden API file. On the
 The version number has two parts: the Wooden API version, then `+`, then the Minecraft version.
 
 ```
-1.0.0+26.1
+1.0.0+26.2
 └─┬─┘ └──┬──┘
-  │      └── for Minecraft 26.1
+  │      └── for Minecraft 26.2
   └───────── Wooden API version 1.0.0
 ```
 
-So for Minecraft 1.21.11 you would use `1.0.0+1.21.11`, and for 26.1 `1.0.0+26.1`. The
-examples below use `1.0.0+26.1`; change the part after `+` to **your** Minecraft version.
+So for Minecraft 26.1 you would use `1.0.0+26.1`, and for 26.2 `1.0.0+26.2`. The
+examples below use `1.0.0+26.2`; change the part after `+` to **your** Minecraft version.
 
 ## Requirements
 
-- Fabric Loader (0.20.1 or newer for 26.1)
+- Fabric Loader (0.20.1 or newer for 26.2)
 - **Fabric API**
 - The Java version your Minecraft version needs (Java **25** for 26.x, Java 21 for 1.21.x)
 
@@ -70,10 +70,10 @@ repositories {
 }
 
 dependencies {
-    implementation "maven.modrinth:jone500-wooden-api:1.0.0+26.1"
+    implementation "maven.modrinth:jone500-wooden-api:1.0.0+26.2"
 
     // Optional, see below
-    // include "maven.modrinth:jone500-wooden-api:1.0.0+26.1"
+    // include "maven.modrinth:jone500-wooden-api:1.0.0+26.2"
 }
 ```
 
@@ -90,7 +90,7 @@ In your `fabric.mod.json`, add Wooden API to `depends`:
 }
 ```
 
-Here you write only the Wooden API part (`1.0.0`), without `+26.1`. If a player has an older
+Here you write only the Wooden API part (`1.0.0`), without `+26.2`. If a player has an older
 Wooden API than this, Fabric shows a clear "please update Wooden API"
 message instead of crashing.
 
@@ -105,8 +105,8 @@ too: you need both. Your `dependencies` in `build.gradle` then look like this:
 
 ```groovy
 dependencies {
-    implementation "maven.modrinth:jone500-wooden-api:1.0.0+26.1"   // lets you use Wooden API in your code
-    include "maven.modrinth:jone500-wooden-api:1.0.0+26.1"          // puts Wooden API inside your mod's jar
+    implementation "maven.modrinth:jone500-wooden-api:1.0.0+26.2"   // lets you use Wooden API in your code
+    include "maven.modrinth:jone500-wooden-api:1.0.0+26.2"          // puts Wooden API inside your mod's jar
 }
 ```
 
@@ -319,8 +319,9 @@ For `Identifier.fromNamespaceAndPath("mymod", "maple")`, put these files in
 
 | File | What it is |
 |---|---|
-| `entity/signs/maple.png` | Sign (the 3D sign in the world) |
-| `entity/signs/hanging/maple.png` | Hanging sign (the 3D sign in the world) |
+| `block/maple_sign.png` | Sign (the 3D sign in the world) |
+| `block/maple_hanging_sign.png` | Hanging sign (the 3D sign in the world) |
+| `gui/signs/maple.png` | Sign picture shown while you type on it |
 | `gui/hanging_signs/maple.png` | Hanging sign picture shown while you type on it |
 | `entity/boat/maple.png` | Boat (or raft) |
 | `entity/chest_boat/maple.png` | Boat with chest (or raft with chest) |
@@ -331,11 +332,17 @@ For `Identifier.fromNamespaceAndPath("mymod", "maple")`, put these files in
 | `block/maple_shelf.png` | Shelf |
 
 Only draw the ones for the things you added. For example, with only `.signs()` you need just
-`entity/signs/maple.png` and `item/maple_sign.png`.
+`block/maple_sign.png`, `gui/signs/maple.png` and `item/maple_sign.png`.
+
+> **Signs changed in Minecraft 26.2.** Signs and hanging signs are now normal block models. Their
+> textures moved from `entity/signs/` to `block/` (`block/maple_sign.png`,
+> `block/maple_hanging_sign.png`) and have a **new, smaller layout** (32×32 instead of 64×32), and
+> there is a new `gui/signs/maple.png`. Sign textures from 26.1 or older do **not** fit: start again
+> from the 26.2 oak textures. Boat, shelf and item textures did not change.
 
 **Easiest way to start:** copy the oak textures from Minecraft and recolor them. They are inside
 the Minecraft jar, which you can open like a zip file. On Windows it is usually at
-`%APPDATA%\.minecraft\versions\26.1\26.1.jar` (start 26.1 once in the launcher if it is not
+`%APPDATA%\.minecraft\versions\26.2\26.2.jar` (start 26.2 once in the launcher if it is not
 there). Inside, go to `assets/minecraft/textures/` and use the same paths as the table, with `oak`
 instead of `maple`. Keep the same image size and layout.
 
@@ -431,13 +438,13 @@ WoodenDatagen.generateRecipes(this, output, ModWoods.MAPLE);
 WoodenDatagen.generateLootTables(this, ModWoods.MAPLE);
 
 // In your FabricTagsProvider.BlockTagsProvider's addTags()
-WoodenDatagen.generateBlockTags((tag, block) -> valueLookupBuilder(tag).add(block), ModWoods.MAPLE);
+WoodenDatagen.generateBlockTags((tag, block) -> builder(tag).add(block.builtInRegistryHolder().key()), ModWoods.MAPLE);
 
 // In your FabricTagsProvider.ItemTagsProvider's addTags()
-WoodenDatagen.generateItemTags((tag, item) -> valueLookupBuilder(tag).add(item), ModWoods.MAPLE);
+WoodenDatagen.generateItemTags((tag, item) -> builder(tag).add(item.builtInRegistryHolder().key()), ModWoods.MAPLE);
 
 // In your FabricTagsProvider.EntityTypeTagsProvider's addTags()
-WoodenDatagen.generateEntityTypeTags((tag, type) -> valueLookupBuilder(tag).add(type), ModWoods.MAPLE);
+WoodenDatagen.generateEntityTypeTags((tag, type) -> builder(tag).add(type.builtInRegistryHolder().key()), ModWoods.MAPLE);
 ```
 
 ### Other languages
@@ -490,10 +497,10 @@ Try placing each sign, writing on it, putting items on the shelf and riding the 
 1. Check the changelog of the new version on Modrinth.
 2. Change the version number in your `build.gradle`:
    ```groovy
-   implementation "maven.modrinth:jone500-wooden-api:1.1.0+26.1"   // was 1.0.0+26.1
+   implementation "maven.modrinth:jone500-wooden-api:1.1.0+26.2"   // was 1.0.0+26.2
    ```
    If you also moved your mod to a new Minecraft version, change the part after `+` too
-   (e.g. `1.1.0+26.2`).
+   (e.g. `1.1.0+26.3`).
 3. Reload Gradle in your IDE.
 4. If you use something that is new in this version, raise the `>=` version in your
    `fabric.mod.json` too.
@@ -529,6 +536,8 @@ same. The names from this README that changed:
 | `FabricBlockLootTableProvider` | `FabricBlockLootSubProvider` |
 | `FabricTagProvider.BlockTagProvider` (`configure()`) | `FabricTagsProvider.BlockTagsProvider` (`addTags()`) |
 | `FabricDataOutput` | `FabricPackOutput` |
+| `valueLookupBuilder(tag).add(block)` | `builder(tag).add(block.builtInRegistryHolder().key())` (from 26.2) |
+| Sign textures in `entity/signs/` | `block/<wood>_sign.png`, new layout (from 26.2, see [step 3](#3-draw-the-textures)) |
 | `RegistryWrapper.WrapperLookup` | `HolderLookup.Provider` |
 
 ---

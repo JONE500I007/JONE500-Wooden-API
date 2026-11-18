@@ -45,7 +45,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallHangingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
@@ -77,8 +77,8 @@ import net.minecraft.world.level.material.MapColor;
  *
  * <p>Textures your mod has to provide (namespace {@code mymod}):
  * <ul>
- *   <li>{@code textures/entity/signs/maple.png}</li>
- *   <li>{@code textures/entity/signs/hanging/maple.png}</li>
+ *   <li>{@code textures/block/maple_sign.png}, {@code textures/gui/signs/maple.png}</li>
+ *   <li>{@code textures/block/maple_hanging_sign.png}</li>
  *   <li>{@code textures/gui/hanging_signs/maple.png}</li>
  *   <li>{@code textures/entity/boat/maple.png}, {@code textures/entity/chest_boat/maple.png}</li>
  *   <li>{@code textures/item/maple_sign.png}, {@code maple_hanging_sign.png}, {@code maple_boat.png},
@@ -133,8 +133,8 @@ public final class WoodSet {
 			this.sign = standing;
 			this.wallSign = wall;
 			this.signItem = registerBlockItem(standing, (block, s) -> new SignItem(block, wall, s), new Item.Properties().stacksTo(16));
-			BlockEntityType.SIGN.addValidBlock(standing);
-			BlockEntityType.SIGN.addValidBlock(wall);
+			BlockEntityTypes.SIGN.addValidBlock(standing);
+			BlockEntityTypes.SIGN.addValidBlock(wall);
 		} else {
 			this.sign = null;
 			this.wallSign = null;
@@ -149,8 +149,8 @@ public final class WoodSet {
 			this.hangingSign = ceiling;
 			this.wallHangingSign = wall;
 			this.hangingSignItem = registerBlockItem(ceiling, (block, s) -> new HangingSignItem(block, wall, s), new Item.Properties().stacksTo(16));
-			BlockEntityType.HANGING_SIGN.addValidBlock(ceiling);
-			BlockEntityType.HANGING_SIGN.addValidBlock(wall);
+			BlockEntityTypes.HANGING_SIGN.addValidBlock(ceiling);
+			BlockEntityTypes.HANGING_SIGN.addValidBlock(wall);
 		} else {
 			this.hangingSign = null;
 			this.wallHangingSign = null;
@@ -206,7 +206,7 @@ public final class WoodSet {
 			Block shelfBlock = Blocks.register(blockKey("_shelf"), ShelfBlock::new, settings);
 			this.shelf = shelfBlock;
 			this.shelfItem = registerBlockItem(shelfBlock, BlockItem::new, new Item.Properties().component(DataComponents.CONTAINER, ItemContainerContents.EMPTY));
-			BlockEntityType.SHELF.addValidBlock(shelfBlock);
+			BlockEntityTypes.SHELF.addValidBlock(shelfBlock);
 			if (flammable) {
 				FlammableBlockRegistry.getDefaultInstance().add(shelfBlock, 30, 20);
 			}

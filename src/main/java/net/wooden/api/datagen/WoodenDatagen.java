@@ -15,7 +15,13 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.data.models.model.ModelTemplate;
 import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.data.models.model.TextureMapping;
+import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -56,9 +62,9 @@ import net.wooden.api.wood.WoodSet;
  * // FabricBlockLootSubProvider#generate()
  * WoodenDatagen.generateLootTables(this, MAPLE);
  * // FabricTagsProvider.BlockTagsProvider#addTags()
- * WoodenDatagen.generateBlockTags((tag, block) -> valueLookupBuilder(tag).add(block), MAPLE);
+ * WoodenDatagen.generateBlockTags((tag, block) -> builder(tag).add(block.builtInRegistryHolder().key()), MAPLE);
  * // FabricTagsProvider.ItemTagsProvider#addTags()
- * WoodenDatagen.generateItemTags((tag, item) -> valueLookupBuilder(tag).add(item), MAPLE);
+ * WoodenDatagen.generateItemTags((tag, item) -> builder(tag).add(item.builtInRegistryHolder().key()), MAPLE);
  * // FabricLanguageProvider#generateTranslations()
  * WoodenDatagen.generateTranslations(builder, MAPLE, "Maple");
  * }</pre>
@@ -134,7 +140,7 @@ public final class WoodenDatagen {
 		pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricTagsProvider.BlockTagsProvider(output, registries) {
 			@Override
 			protected void addTags(HolderLookup.Provider lookup) {
-				WoodenDatagen.generateBlockTags((tag, block) -> valueLookupBuilder(tag).add(block), array);
+				WoodenDatagen.generateBlockTags((tag, block) -> builder(tag).add(block.builtInRegistryHolder().key()), array);
 			}
 
 			@Override
@@ -146,7 +152,7 @@ public final class WoodenDatagen {
 		pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricTagsProvider.ItemTagsProvider(output, registries) {
 			@Override
 			protected void addTags(HolderLookup.Provider lookup) {
-				WoodenDatagen.generateItemTags((tag, item) -> valueLookupBuilder(tag).add(item), array);
+				WoodenDatagen.generateItemTags((tag, item) -> builder(tag).add(item.builtInRegistryHolder().key()), array);
 			}
 
 			@Override
@@ -158,7 +164,7 @@ public final class WoodenDatagen {
 		pack.addProvider((FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) -> new FabricTagsProvider.EntityTypeTagsProvider(output, registries) {
 			@Override
 			protected void addTags(HolderLookup.Provider lookup) {
-				WoodenDatagen.generateEntityTypeTags((tag, type) -> valueLookupBuilder(tag).add(type), array);
+				WoodenDatagen.generateEntityTypeTags((tag, type) -> builder(tag).add(type.builtInRegistryHolder().key()), array);
 			}
 
 			@Override
@@ -195,18 +201,59 @@ public final class WoodenDatagen {
 	public static void generateBlockStateModels(BlockModelGenerators gen, WoodSet... sets) {
 		for (WoodSet set : sets) {
 			if (set.hasSigns()) {
-				// Signs only have a particle model. Vanilla's hanging sign helper does exactly what
-				// a sign needs (particle model from a texture block, same model for both blocks,
-				// flat item model), so it is reused with the planks as texture.
-				gen.createHangingSign(planks(set), set.getSign(), set.getWallSign());
+				generateSign(gen, set.getSign(), set.getWallSign(), planks(set));
 			}
 			if (set.hasHangingSigns()) {
-				gen.createHangingSign(strippedLog(set), set.getHangingSign(), set.getWallHangingSign());
+				generateHangingSign(gen, set.getHangingSign(), set.getWallHangingSign(), strippedLog(set));
 			}
 			if (set.hasShelf()) {
 				gen.createShelf(set.getShelf(), strippedLog(set));
 			}
 		}
+	}
+
+	/**
+	 * Same as vanilla's {@code BlockFamilyProvider.sign}: since 26.2 signs are block models.
+	 * Texture {@code textures/block/<wood>_sign.png}, particles from the planks.
+	 */
+	private static void generateSign(BlockModelGenerators gen, Block sign, Block wallSign, Block planks) {
+		TextureMapping mapping = new TextureMapping()
+				.put(TextureSlot.ALL, TextureMapping.getBlockTexture(sign))
+				.put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(planks));
+		gen.blockStateOutput.accept(BlockModelGenerators.createSign(sign,
+				variant(gen, ModelTemplates.SIGN_ROT_0, sign, "_rot_0", mapping),
+				variant(gen, ModelTemplates.SIGN_ROT_1, sign, "_rot_1", mapping),
+				variant(gen, ModelTemplates.SIGN_ROT_2, sign, "_rot_2", mapping),
+				variant(gen, ModelTemplates.SIGN_ROT_3, sign, "_rot_3", mapping)));
+		MultiVariant wallModel = BlockModelGenerators.plainVariant(ModelTemplates.WALL_SIGN.create(wallSign, mapping, gen.modelOutput));
+		gen.blockStateOutput.accept(MultiVariantGenerator.dispatch(wallSign, wallModel).with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING_ALT));
+		gen.registerSimpleFlatItemModel(sign.asItem());
+	}
+
+	/**
+	 * Same as vanilla's {@code BlockFamilyProvider.hangingSign}.
+	 * Texture {@code textures/block/<wood>_hanging_sign.png}, particles from the stripped log.
+	 */
+	private static void generateHangingSign(BlockModelGenerators gen, Block hangingSign, Block wallHangingSign, Block strippedLog) {
+		TextureMapping mapping = new TextureMapping()
+				.put(TextureSlot.ALL, TextureMapping.getBlockTexture(hangingSign))
+				.put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(strippedLog));
+		gen.blockStateOutput.accept(BlockModelGenerators.createHangingSign(hangingSign,
+				variant(gen, ModelTemplates.HANGING_SIGN_ROT_0, hangingSign, "_rot_0", mapping),
+				variant(gen, ModelTemplates.HANGING_SIGN_ROT_1, hangingSign, "_rot_1", mapping),
+				variant(gen, ModelTemplates.HANGING_SIGN_ROT_2, hangingSign, "_rot_2", mapping),
+				variant(gen, ModelTemplates.HANGING_SIGN_ROT_3, hangingSign, "_rot_3", mapping),
+				variant(gen, ModelTemplates.ATTACHED_HANGING_SIGN_ROT_0, hangingSign, "_attached_rot_0", mapping),
+				variant(gen, ModelTemplates.ATTACHED_HANGING_SIGN_ROT_1, hangingSign, "_attached_rot_1", mapping),
+				variant(gen, ModelTemplates.ATTACHED_HANGING_SIGN_ROT_2, hangingSign, "_attached_rot_2", mapping),
+				variant(gen, ModelTemplates.ATTACHED_HANGING_SIGN_ROT_3, hangingSign, "_attached_rot_3", mapping)));
+		MultiVariant wallModel = BlockModelGenerators.plainVariant(ModelTemplates.WALL_HANGING_SIGN.create(wallHangingSign, mapping, gen.modelOutput));
+		gen.blockStateOutput.accept(MultiVariantGenerator.dispatch(wallHangingSign, wallModel).with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING_ALT));
+		gen.registerSimpleFlatItemModel(hangingSign.asItem());
+	}
+
+	private static MultiVariant variant(BlockModelGenerators gen, ModelTemplate template, Block block, String suffix, TextureMapping mapping) {
+		return BlockModelGenerators.plainVariant(template.create(ModelLocationUtils.getModelLocation(block, suffix), mapping, gen.modelOutput));
 	}
 
 	/** Item models for boats and chest boats (flat item texture {@code textures/item/<id>.png}). */
@@ -225,11 +272,16 @@ public final class WoodenDatagen {
 			if (set.hasSigns()) {
 				Block planks = planks(set);
 				gen.signBuilder(set.getSignItem(), Ingredient.of(planks))
+						.group("wooden_sign")
 						.unlockedBy(RecipeProvider.getHasName(planks), gen.has(planks))
 						.save(exporter);
 			}
 			if (set.hasHangingSigns()) {
-				gen.hangingSign(set.getHangingSignItem(), strippedLog(set));
+				Block strippedLog = strippedLog(set);
+				gen.hangingSignBuilder(set.getHangingSignItem(), Ingredient.of(strippedLog))
+						.group("wooden_hanging_sign")
+						.unlockedBy(RecipeProvider.getHasName(strippedLog), gen.has(strippedLog))
+						.save(exporter);
 			}
 			if (set.hasBoats()) {
 				gen.woodenBoat(set.getBoatItem(), planks(set));

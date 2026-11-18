@@ -3,7 +3,7 @@ package net.wooden.testmod;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 
@@ -20,20 +20,20 @@ public class WoodenClientGameTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
 		try (TestSingleplayerContext world = context.worldBuilder().create()) {
-			world.getClientLevel().waitForChunksRender();
+			world.getConnection().waitForChunksRender();
 			buildScene(world.getServer());
-			world.getClientLevel().waitForChunksRender();
+			world.getConnection().waitForChunksRender();
 			context.waitTicks(40);
 			context.takeScreenshot("wooden_api_world");
 		}
 
 		try (TestDedicatedServerContext server = context.worldBuilder().createServer()) {
 			// Spawn is far from 0,0 on a fresh dedicated server; place things around the player instead.
-			try (TestServerConnection connection = server.connect()) {
-				connection.getClientLevel().waitForChunksRender();
+			try (TestDedicatedServerConnection connection = server.connect()) {
+				connection.waitForChunksRender();
 				server.runCommand("op @a");
 				buildScene(server);
-				connection.getClientLevel().waitForChunksRender();
+				connection.waitForChunksRender();
 				context.waitTicks(40);
 				context.takeScreenshot("wooden_api_dedicated_server");
 			}

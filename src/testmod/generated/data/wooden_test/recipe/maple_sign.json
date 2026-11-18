@@ -1,7 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "group": "sign",
+  "group": "wooden_sign",
   "key": {
     "#": "wooden_test:maple_planks",
     "X": "minecraft:stick"

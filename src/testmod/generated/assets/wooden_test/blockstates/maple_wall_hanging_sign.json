@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "wooden_test:block/maple_hanging_sign"
+    "facing=east": {
+      "model": "wooden_test:block/maple_wall_hanging_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "wooden_test:block/maple_wall_hanging_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "wooden_test:block/maple_wall_hanging_sign"
+    },
+    "facing=west": {
+      "model": "wooden_test:block/maple_wall_hanging_sign",
+      "y": 90
     }
   }
 }
