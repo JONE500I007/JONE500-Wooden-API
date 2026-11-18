@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_shelf_unconnected",
+  "textures": {
+    "all": "wooden_test:block/maple_shelf",
+    "particle": "wooden_test:block/stripped_maple_log"
+  }
+}

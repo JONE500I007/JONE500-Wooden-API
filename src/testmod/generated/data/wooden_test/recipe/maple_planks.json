@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "wooden_test:stripped_maple_log"
+  ],
+  "result": {
+    "count": 4,
+    "id": "wooden_test:maple_planks"
+  }
+}

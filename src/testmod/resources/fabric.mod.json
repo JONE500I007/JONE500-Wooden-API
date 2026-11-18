@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "wooden_test",
+	"version": "${version}",
+	"name": "Wooden API Test Mod",
+	"description": "Example wood (maple) made with Wooden API. Dev only.",
+	"license": "CC0-1.0",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.wooden.testmod.WoodenTestMod"
+		],
+		"fabric-datagen": [
+			"net.wooden.testmod.WoodenTestModDataGen"
+		],
+		"fabric-gametest": [
+			"net.wooden.testmod.WoodenServerGameTest"
+		],
+		"fabric-client-gametest": [
+			"net.wooden.testmod.WoodenClientGameTest"
+		]
+	},
+	"depends": {
+		"jone500_wooden_api": "*",
+		"fabric-api": "*"
+	}
+}
