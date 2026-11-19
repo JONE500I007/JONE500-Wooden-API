@@ -12,12 +12,6 @@
 		],
 		"fabric-datagen": [
 			"net.wooden.testmod.WoodenTestModDataGen"
-		],
-		"fabric-gametest": [
-			"net.wooden.testmod.WoodenServerGameTest"
-		],
-		"fabric-client-gametest": [
-			"net.wooden.testmod.WoodenClientGameTest"
 		]
 	},
 	"depends": {
