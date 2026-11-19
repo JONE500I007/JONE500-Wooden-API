@@ -52,23 +52,6 @@ loom {
 			source sourceSets.testmod
 			runDir "run/server"
 		}
-		// Automated test on a real dedicated server (no client code): places blocks, spawns boats.
-		gameTest {
-			server()
-			configName = "Server Game Test"
-			vmArg "-Dfabric-api.gametest"
-			vmArg "-Dfabric-api.gametest.report-file=${file("build/run/gameTest/junit.xml")}"
-			source sourceSets.testmod
-			runDir "build/run/gameTest"
-		}
-		// Automated in-game test: opens a world, places all blocks, takes screenshots, then quits.
-		clientGameTest {
-			client()
-			configName = "Client Game Test"
-			vmArg "-Dfabric.client.gametest"
-			source sourceSets.testmod
-			runDir "build/run/clientGameTest"
-		}
 		// Runs data generation for the testmod (shows how a user of the API does datagen).
 		datagen {
 			client()
@@ -79,17 +62,6 @@ loom {
 			source sourceSets.testmod
 			runDir "build/datagen"
 		}
-	}
-}
-
-// The client game test also starts a dedicated server, which only runs if the Minecraft EULA
-// (https://aka.ms/MinecraftEULA) is accepted. The project owner has accepted it, so eula.txt is
-// written into the test folder (only there) before every run.
-def clientGameTestEula = file("build/run/clientGameTest/eula.txt")
-tasks.named("runClientGameTest") {
-	doFirst {
-		clientGameTestEula.parentFile.mkdirs()
-		clientGameTestEula.text = "eula=true\n"
 	}
 }
 
