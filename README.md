@@ -29,6 +29,9 @@ The version number has two parts: the Wooden API version, then `+`, then the Min
   └───────── Wooden API version 1.0.0
 ```
 
+**Minecraft 26.1, 26.1.1 and 26.1.2 all use the same file, `+26.1`.** There is no `+26.1.1` or
+`+26.1.2`. Use `1.0.0+26.1` even if your mod is for 26.1.2.
+
 So for Minecraft 1.21.11 you would use `1.0.0+1.21.11`, and for 26.1 `1.0.0+26.1`. The
 examples below use `1.0.0+26.1`; change the part after `+` to **your** Minecraft version.
 

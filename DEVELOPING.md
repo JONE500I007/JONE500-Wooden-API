@@ -74,6 +74,22 @@ own build:
    (`1.21.9`, `1.21.10`, `1.21.11`, `26.1`, ...).
 4. Update the Minecraft version in the README examples (`1.0.0+26.1`, the Minecraft jar path).
 
+### Patch versions (26.1.1, 26.1.2, ...)
+
+Small Minecraft updates such as 26.1.1 and 26.1.2 do **not** get their own branch. The `26.1`
+branch is built against the **lowest** version (`minecraft_version=26.1`), and
+`"minecraft": "~26.1"` in `fabric.mod.json` lets the same jar load on every 26.1.x.
+
+When a new patch version comes out, test the branch on it without changing `gradle.properties`
+(use the Fabric API version for that patch from <https://fabricmc.net/develop>):
+
+```
+gradlew runGameTest runClientGameTest -Pminecraft_version=26.1.2 -Pfabric_api_version=0.155.3+26.1.2
+```
+
+If the tests pass, upload the same jar and tick the new game version on Modrinth (or edit the
+existing version and add it). Tested so far: 26.1, 26.1.1, 26.1.2.
+
 ### 1.21.x branches vs 26.x branches
 
 Minecraft 26.1 is no longer obfuscated, so the two kinds of branches are set up differently:
