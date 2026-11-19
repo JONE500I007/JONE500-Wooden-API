@@ -8,7 +8,7 @@ Notes for working on Wooden API itself. If you only want to **use** Wooden API i
 | Folder | What it is |
 |---|---|
 | `src/main` | The library itself (the only thing in the published jar) |
-| `src/testmod` | An example mod ("maple" wood) that uses Wooden API, plus the automated tests |
+| `src/testmod` | An example mod ("maple" wood) that uses Wooden API |
 | `src/testmod/generated` | Data generation output of the testmod (do not edit by hand) |
 
 ## Gradle tasks
@@ -17,8 +17,6 @@ Notes for working on Wooden API itself. If you only want to **use** Wooden API i
 |---|---|
 | `runTestmodClient` | Minecraft with Wooden API + the example maple wood |
 | `runDatagen` | Runs data generation for the testmod (output: `src/testmod/generated`) |
-| `runGameTest` | Automated test on a real dedicated server (no client code): signs, shelf and boats work and nothing crashes |
-| `runClientGameTest` | Automated test: places everything in singleplayer **and** on a dedicated server the client joins, saves screenshots to `build/run/clientGameTest/screenshots` |
 | `build` | Builds `build/libs/jone500-wooden-api-<version>.jar` (testmod not included) |
 | `publishToMavenLocal` | Publishes to `~/.m2` so other mods on this computer can use `mavenLocal()` |
 
@@ -28,7 +26,7 @@ Wooden API is distributed through Modrinth, which also serves every uploaded ver
 artifact (`maven.modrinth:jone500-wooden-api:<version>`).
 
 1. Change `mod_version` in `gradle.properties` (e.g. `1.0.1`).
-2. Run `gradlew runGameTest` and `gradlew runClientGameTest`, and look at the screenshots.
+2. Run `gradlew runTestmodClient` and check the signs, boats and shelf in game.
 3. Run `gradlew build`.
 4. On Modrinth, create a new version of the `jone500-wooden-api` project with the **same version number**
    as the jar (e.g. `1.0.1+1.21.10`), tick the matching game version, and upload
@@ -66,14 +64,7 @@ own build:
 1. Update `minecraft_version`, `yarn_mappings`, `loader_version` and `fabric_api_version` in
    `gradle.properties` (values from <https://fabricmc.net/develop>), and `"minecraft"` in
    `src/main/resources/fabric.mod.json`.
-2. Fix compile errors. Then run `gradlew runGameTest` and `gradlew runClientGameTest`, and open the
-   images in `build/run/clientGameTest/screenshots` to make sure the signs, boats and shelf still
-   look right.
+2. Fix compile errors. Then run `gradlew runTestmodClient`, and check in game that the signs,
+   boats and shelf still look right.
 3. The Minecraft part of the version number (`+1.21.10`) comes from `minecraft_version`, so it
    changes by itself. Each Minecraft version lives on its own git branch (`1.21.9`, `1.21.10`, ...).
-
-### Minecraft EULA
-
-`runClientGameTest` starts a dedicated server, which needs the Minecraft EULA accepted.
-`build.gradle` writes `eula=true` into `build/run/clientGameTest/eula.txt` (and nowhere else)
-before each run, because the project owner has accepted it.
