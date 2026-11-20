@@ -122,6 +122,66 @@ Both are fine. `include` is easier for players.
 If several mods include different Wooden API versions, Fabric loads only the newest one, so they
 don't conflict.
 
+### Getting Wooden API from CurseForge instead (CurseMaven)
+
+Wooden API is also on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/jone500-wooden-api).
+CurseForge has no Maven of its own, so you use **CurseMaven**, a free service that turns CurseForge
+files into Gradle dependencies. Use it in place of the Modrinth repository above (you don't need
+both).
+
+**1. Find the file ID.** On CurseForge, open **Files**, click the file for **your** Minecraft
+version, and copy the **File ID** number. Each Minecraft version has a different file ID.
+
+![CurseForge Files page: the File ID in the file's details, and the Project ID in the box on the right](docs/images/curseforge-project-and-file-id.png)
+
+- **Project ID** (red arrow, in the box on the **right** side of the page): `1815936`. The same for
+  every file.
+- **File ID** (blue arrow, in the file's details, under **FILE ID**): `9695055` in the picture (the
+  26.3 file). Different for every file. The small button next to each number copies it.
+
+**2. Add CurseMaven to `build.gradle`:**
+
+```groovy
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "CurseMaven"
+                url = "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
+dependencies {
+    implementation "curse.maven:jone500-wooden-api-1815936:9695055"
+
+    // Optional: put Wooden API inside your mod's jar (see "What is include?" above)
+    // include "curse.maven:jone500-wooden-api-1815936:9695055"
+}
+```
+
+The dependency has three parts:
+
+```
+curse.maven:jone500-wooden-api-1815936:9695055
+            └────────┬───────┘ └──┬──┘ └──┬──┘
+                     │            │       └── File ID (changes for every file / Minecraft version)
+                     │            └────────── Project ID of Wooden API (always 1815936)
+                     └─────────────────────── any name you like, usually the mod's slug
+```
+
+`9695055` is the file for **Minecraft 26.3**. For another Minecraft version, replace only the last
+number with the File ID from step 1.
+
+**3.** The `fabric.mod.json` part is the same as above (`"jone500_wooden_api": ">=1.0.0"`).
+
+If you upload your mod to CurseForge **without** `include`, add Wooden API under *Relations* as a
+**Required Dependency** when you upload the file, so the CurseForge app downloads it for players.
+
 ---
 
 ## 2. Register your wood
