@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "wooden_tutorial:block/reed_planks"
+  }
+}
