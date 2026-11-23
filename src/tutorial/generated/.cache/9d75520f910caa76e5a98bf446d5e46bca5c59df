@@ -1,0 +1,9 @@
+// 1.21.11	-999999999-01-01T00:00:00	Wooden API Tutorial/Wooden Tutorial Recipes
+ed80c5c0fda51191959122481f85d34d7b30c3c8 data/wooden_tutorial/advancement/recipes/building_blocks/ember_planks.json
+98dc95d0e502ebccb1787bed78fbfbeb3223dc23 data/wooden_tutorial/advancement/recipes/building_blocks/maple_planks.json
+f0e55a80e8bc5f1855e7849d0af2cdd1d1bf3ca3 data/wooden_tutorial/advancement/recipes/building_blocks/reed_planks.json
+01398a79026525959f382e7ad7c777301ecfcd73 data/wooden_tutorial/advancement/recipes/building_blocks/willow_planks.json
+28e7cd89f5d6a775bad2c0acf9f826009b3e0e39 data/wooden_tutorial/recipe/ember_planks.json
+54abb0d0181f39781c63abfc7a86fc6497d3116a data/wooden_tutorial/recipe/maple_planks.json
+d8c23427f193776178eed47b16c7f04e8515a889 data/wooden_tutorial/recipe/reed_planks.json
+5222ea91d4fc98f930eaaeed54d39df7073154af data/wooden_tutorial/recipe/willow_planks.json

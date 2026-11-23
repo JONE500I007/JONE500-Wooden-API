@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_ember_planks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "wooden_tutorial:ember_planks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "wooden_tutorial:ember_sign"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ember_planks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "wooden_tutorial:ember_sign"
+    ]
+  }
+}
