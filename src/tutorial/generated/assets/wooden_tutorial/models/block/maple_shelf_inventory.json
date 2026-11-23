@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_shelf_inventory",
+  "textures": {
+    "all": "wooden_tutorial:block/maple_shelf",
+    "particle": "wooden_tutorial:block/stripped_maple_log"
+  }
+}

@@ -1,0 +1,21 @@
+{
+	"schemaVersion": 1,
+	"id": "wooden_tutorial",
+	"version": "${version}",
+	"name": "Wooden API Tutorial",
+	"description": "Tutorial mod: how to use Wooden API (maple, willow, reed and ember wood). Dev only.",
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.wooden.tutorial.TutorialMod"
+		],
+		"fabric-datagen": [
+			"net.wooden.tutorial.TutorialDataGen"
+		]
+	},
+	"depends": {
+		"jone500_wooden_api": "*",
+		"fabric-api": "*"
+	}
+}

@@ -1,0 +1,10 @@
+// 1.21.9	-999999999-01-01T00:00:00	Wooden API Tutorial/Wooden API Block Loot Tables
+6ac21a9ddb2a600dc2c50c4f3e1663e10de1a5d5 data/wooden_tutorial/loot_table/blocks/ember_hanging_sign.json
+1eaea3a65c08b61a744e5c2eba75a4a4f9c5769b data/wooden_tutorial/loot_table/blocks/ember_shelf.json
+0bd8b2125bf43acf40b92f8418c67596939b624b data/wooden_tutorial/loot_table/blocks/ember_sign.json
+ea5cb935119c5245297b2fef72c70864a46d470a data/wooden_tutorial/loot_table/blocks/maple_hanging_sign.json
+26ccf4711852064977214b90b349fcbb89d8ef04 data/wooden_tutorial/loot_table/blocks/maple_shelf.json
+74572509db3d4fbcfc53b721c662f6ba3a25078e data/wooden_tutorial/loot_table/blocks/maple_sign.json
+01d1f190ef46bcccc8ddfeb034408feb65e87e87 data/wooden_tutorial/loot_table/blocks/reed_sign.json
+6dff7b47da61078a7b7e3ea363b7d20c04aa49f9 data/wooden_tutorial/loot_table/blocks/willow_hanging_sign.json
+a4a61624bbacb015b2e54dc857134f94452335a1 data/wooden_tutorial/loot_table/blocks/willow_sign.json

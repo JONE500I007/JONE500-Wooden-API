@@ -48,6 +48,11 @@ examples below use `1.0.0+1.21.9`; change the part after `+` to **your** Minecra
 
 If something does not work, see [Common problems](#common-problems).
 
+> **Learn from code:** [`src/tutorial`](src/tutorial/java/net/wooden/tutorial) is a complete mod that uses Wooden
+> API, one lesson per file with comments: everything with `.all()`, picking parts, rafts, Nether wood, your own
+> creative tab, using a `WoodSet` in your code, and data generation (both ways). Start with
+> [`TutorialMod.java`](src/tutorial/java/net/wooden/tutorial/TutorialMod.java).
+
 ---
 
 ## 1. Add Wooden API to your mod
