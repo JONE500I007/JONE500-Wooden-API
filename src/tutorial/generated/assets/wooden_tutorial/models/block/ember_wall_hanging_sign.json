@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_hanging_sign",
+  "textures": {
+    "all": "wooden_tutorial:block/ember_hanging_sign",
+    "particle": "wooden_tutorial:block/stripped_ember_log"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "boat",
+  "key": {
+    "#": "wooden_tutorial:ember_planks"
+  },
+  "pattern": [
+    "# #",
+    "###"
+  ],
+  "result": {
+    "id": "wooden_tutorial:ember_boat"
+  }
+}

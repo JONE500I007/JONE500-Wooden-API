@@ -8,16 +8,16 @@ Notes for working on Wooden API itself. If you only want to **use** Wooden API i
 | Folder | What it is |
 |---|---|
 | `src/main` | The library itself (the only thing in the published jar) |
-| `src/testmod` | An example mod ("maple" wood) that uses Wooden API |
-| `src/testmod/generated` | Data generation output of the testmod (do not edit by hand) |
+| `src/tutorial` | The tutorial mod: how to use Wooden API, one lesson per file (start with `TutorialMod.java`) |
+| `src/tutorial/generated` | Data generation output of the tutorial (do not edit by hand) |
 
 ## Gradle tasks
 
 | Gradle task | What it does |
 |---|---|
-| `runTestmodClient` | Minecraft with Wooden API + the example maple wood |
-| `runDatagen` | Runs data generation for the testmod (output: `src/testmod/generated`) |
-| `build` | Builds `build/libs/jone500-wooden-api-<version>.jar` (testmod not included) |
+| `runTutorialClient` | Minecraft with Wooden API + the tutorial woods (maple, willow, reed, ember) |
+| `runDatagen` | Runs data generation for the tutorial (output: `src/tutorial/generated`) |
+| `build` | Builds `build/libs/jone500-wooden-api-<version>.jar` (tutorial not included) |
 | `publishToMavenLocal` | Publishes to `~/.m2` so other mods on this computer can use `mavenLocal()` |
 
 ## Releasing a new version (Modrinth)
@@ -26,7 +26,7 @@ Wooden API is distributed through Modrinth, which also serves every uploaded ver
 artifact (`maven.modrinth:jone500-wooden-api:<version>`).
 
 1. Change `mod_version` in `gradle.properties` (e.g. `1.0.1`).
-2. Run `gradlew runTestmodClient` and check the signs, boats and shelf in game.
+2. Run `gradlew runTutorialClient` and check the signs, boats and shelf in game.
 3. Run `gradlew build`.
 4. On Modrinth, create a new version of the `jone500-wooden-api` project with the **same version number**
    as the jar (e.g. `1.0.1+26.3`), tick the matching game version, and upload
@@ -64,7 +64,7 @@ own build:
 1. Update `minecraft_version`, `loader_version` and `fabric_api_version` in `gradle.properties`
    (values from <https://fabricmc.net/develop>), and `"minecraft"` in
    `src/main/resources/fabric.mod.json`.
-2. Fix compile errors. Then run `gradlew runDatagen` and `gradlew runTestmodClient`, and check in
+2. Fix compile errors. Then run `gradlew runDatagen` and `gradlew runTutorialClient`, and check in
    game that the signs, boats and shelf still look right.
 3. The Minecraft part of the version number (`+26.3`) comes from `minecraft_version`, so it
    changes by itself. Each Minecraft version lives on its own git branch

@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/template_wall_hanging_sign",
-  "textures": {
-    "all": "wooden_test:block/maple_hanging_sign",
-    "particle": "wooden_test:block/stripped_maple_log"
-  }
-}

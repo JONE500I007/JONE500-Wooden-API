@@ -1,0 +1,9 @@
+// 26.3	-999999999-01-01T00:00:00	Wooden API Tutorial/Block Loot Tables
+f2c8e229fc928ecf9b88fefb446ad30be7adfced data/wooden_tutorial/loot_table/blocks/ember_planks.json
+c38ec6382221fb6d3050d72ae0fb2f9a5b80be3c data/wooden_tutorial/loot_table/blocks/maple_planks.json
+6a52b03c4ceba0dff946d11f633594314974711d data/wooden_tutorial/loot_table/blocks/reed_planks.json
+07ded07a98c2e5b1303bb3e1b6aff24e2861203e data/wooden_tutorial/loot_table/blocks/stripped_ember_log.json
+29890fea210cb5148ccbf9a42e5e0ff83f131620 data/wooden_tutorial/loot_table/blocks/stripped_maple_log.json
+49bd9f75ad93b92b3d0a3fd5dc8dc904e061f249 data/wooden_tutorial/loot_table/blocks/stripped_reed_log.json
+d3b70a4b9e8123627b812e5f413fb277a8285e38 data/wooden_tutorial/loot_table/blocks/stripped_willow_log.json
+c5718284f970e096e43177cdca8c8ee6c55389a9 data/wooden_tutorial/loot_table/blocks/willow_planks.json

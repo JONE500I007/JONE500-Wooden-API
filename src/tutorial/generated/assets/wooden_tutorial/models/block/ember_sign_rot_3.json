@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_sign_rot_3",
+  "textures": {
+    "all": "wooden_tutorial:block/ember_sign",
+    "particle": "wooden_tutorial:block/ember_planks"
+  }
+}

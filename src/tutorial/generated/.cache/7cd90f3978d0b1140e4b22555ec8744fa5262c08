@@ -1,0 +1,6 @@
+// 26.3	-999999999-01-01T00:00:00	Wooden API Tutorial/Wooden API Block Tags
+ced921bfce304de48787d0e6bd99c73ac3133dc6 data/minecraft/tags/block/ceiling_hanging_signs.json
+f317b7f26c476ac131d62f7180d40e887af4ce23 data/minecraft/tags/block/standing_signs.json
+c8f9c80265b56a79d5ff7c7c7ea58afc30807daa data/minecraft/tags/block/wall_hanging_signs.json
+eac18cc7272645b15f59e876ce3d440a871de6c7 data/minecraft/tags/block/wall_signs.json
+97770ef38e2e8ffdee09e9032433a76e3ec11ab9 data/minecraft/tags/block/wooden_shelves.json
