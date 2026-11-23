@@ -16,15 +16,15 @@ repositories {
 }
 
 // ---------------------------------------------------------------------------
-// "testmod" source set: an example mod that USES Wooden API.
-// It is only for testing in the dev environment and is NOT included in the
-// published jar. Its code lives in src/testmod/.
+// "tutorial" source set: a tutorial mod that shows how to USE Wooden API
+// (start with src/tutorial/java/net/wooden/tutorial/TutorialMod.java).
+// It is only for the dev environment and is NOT included in the published jar.
 // ---------------------------------------------------------------------------
 sourceSets {
-	testmod {
+	tutorial {
 		compileClasspath += main.compileClasspath + main.output
 		runtimeClasspath += main.runtimeClasspath + main.output
-		resources.srcDir 'src/testmod/generated'
+		resources.srcDir 'src/tutorial/generated'
 	}
 }
 
@@ -33,33 +33,33 @@ loom {
 		"jone500_wooden_api" {
 			sourceSet sourceSets.main
 		}
-		"wooden_test" {
-			sourceSet sourceSets.testmod
+		"wooden_tutorial" {
+			sourceSet sourceSets.tutorial
 		}
 	}
 
 	runs {
-		// Minecraft with Wooden API + the example wood from the testmod.
-		testmodClient {
+		// Minecraft with Wooden API + the tutorial woods.
+		tutorialClient {
 			client()
-			configName = "Testmod Client"
-			source sourceSets.testmod
+			configName = "Tutorial Client"
+			source sourceSets.tutorial
 			runDir "run"
 		}
-		testmodServer {
+		tutorialServer {
 			server()
-			configName = "Testmod Server"
-			source sourceSets.testmod
+			configName = "Tutorial Server"
+			source sourceSets.tutorial
 			runDir "run/server"
 		}
-		// Runs data generation for the testmod (shows how a user of the API does datagen).
+		// Runs data generation for the tutorial (shows how a user of the API does datagen).
 		datagen {
 			client()
-			configName = "Data Generation (testmod)"
+			configName = "Data Generation (tutorial)"
 			vmArg "-Dfabric-api.datagen"
-			vmArg "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
-			vmArg "-Dfabric-api.datagen.modid=wooden_test"
-			source sourceSets.testmod
+			vmArg "-Dfabric-api.datagen.output-dir=${file("src/tutorial/generated")}"
+			vmArg "-Dfabric-api.datagen.modid=wooden_tutorial"
+			source sourceSets.tutorial
 			runDir "build/datagen"
 		}
 	}
@@ -84,7 +84,7 @@ processResources {
 	}
 }
 
-processTestmodResources {
+processTutorialResources {
 	def version = project.version
 	inputs.property "version", version
 

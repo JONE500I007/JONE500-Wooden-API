@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_stripped_ember_log": {
+      "conditions": {
+        "items": [
+          {
+            "items": "wooden_tutorial:stripped_ember_log"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "wooden_tutorial:ember_shelf"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_stripped_ember_log"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "wooden_tutorial:ember_shelf"
+    ]
+  }
+}

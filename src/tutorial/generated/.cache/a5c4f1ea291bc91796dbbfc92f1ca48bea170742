@@ -1,0 +1,7 @@
+// 1.21.10	-999999999-01-01T00:00:00	Wooden API Tutorial/Wooden API Item Tags
+558b9fd37a25e84e85cf909e60f68c85063618be data/minecraft/tags/item/boats.json
+dc65ab95dc8cf75294ff721ae08859ae9c5f3f7d data/minecraft/tags/item/chest_boats.json
+ced921bfce304de48787d0e6bd99c73ac3133dc6 data/minecraft/tags/item/hanging_signs.json
+849fe28f7300cfe4af5d568b9d5759cf18ac76c3 data/minecraft/tags/item/non_flammable_wood.json
+f317b7f26c476ac131d62f7180d40e887af4ce23 data/minecraft/tags/item/signs.json
+97770ef38e2e8ffdee09e9032433a76e3ec11ab9 data/minecraft/tags/item/wooden_shelves.json
