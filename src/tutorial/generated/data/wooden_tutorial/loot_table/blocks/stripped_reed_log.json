@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "wooden_tutorial:stripped_reed_log"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

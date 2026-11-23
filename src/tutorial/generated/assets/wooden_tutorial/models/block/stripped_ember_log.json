@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "wooden_tutorial:block/stripped_ember_log_top",
+    "side": "wooden_tutorial:block/stripped_ember_log"
+  }
+}

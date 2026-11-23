@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/template_sign_rot_1",
-  "textures": {
-    "all": "wooden_test:block/maple_sign",
-    "particle": "wooden_test:block/maple_planks"
-  }
-}

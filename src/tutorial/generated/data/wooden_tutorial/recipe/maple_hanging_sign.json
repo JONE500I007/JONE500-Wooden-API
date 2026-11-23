@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "wooden_hanging_sign",
+  "key": {
+    "#": "wooden_tutorial:stripped_maple_log",
+    "X": "minecraft:iron_chain"
+  },
+  "pattern": [
+    "X X",
+    "###",
+    "###"
+  ],
+  "result": {
+    "count": 6,
+    "id": "wooden_tutorial:maple_hanging_sign"
+  }
+}

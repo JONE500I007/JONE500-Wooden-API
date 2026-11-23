@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "wooden_test:item/maple_chest_boat"
-  }
-}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "wooden_tutorial:stripped_reed_log"
+  ],
+  "result": {
+    "count": 4,
+    "id": "wooden_tutorial:reed_planks"
+  }
+}

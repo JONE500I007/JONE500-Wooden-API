@@ -1,8 +1,0 @@
-// 26.2	-999999999-01-01T00:00:00	Wooden API Test Mod/Model Definitions
-bedfd5b8a90a1abc945dcfd79a65b75c87c1d710 assets/wooden_test/blockstates/maple_planks.json
-5b0584f411c58dce5976ecef019cfec8c1b06e2c assets/wooden_test/blockstates/stripped_maple_log.json
-dac6ab89ca3790b0f0d12c14cd7aa14b82b645a0 assets/wooden_test/items/maple_planks.json
-98d72a4ddbf6cec96e02bf0a211cfcf273760d36 assets/wooden_test/items/stripped_maple_log.json
-0b27bed47bbdfd71c3b690aa945d8f4992717d9d assets/wooden_test/models/block/maple_planks.json
-02a80fbd7af86c2f08c81f1ada7d50732f04debd assets/wooden_test/models/block/stripped_maple_log.json
-b1b6e018ab7513ad4a4a042012cf578a85dd6cc6 assets/wooden_test/models/block/stripped_maple_log_horizontal.json

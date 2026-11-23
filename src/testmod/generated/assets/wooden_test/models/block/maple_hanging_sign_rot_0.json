@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/template_hanging_sign_rot_0",
-  "textures": {
-    "all": "wooden_test:block/maple_hanging_sign",
-    "particle": "wooden_test:block/stripped_maple_log"
-  }
-}
