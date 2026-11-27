@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplate;
@@ -204,10 +205,10 @@ public final class WoodenDatagen {
 	public static void generateBlockStateModels(BlockModelGenerators gen, WoodSet... sets) {
 		for (WoodSet set : sets) {
 			if (set.hasSigns()) {
-				generateSign(gen, set.getSign(), set.getWallSign(), planks(set));
+				generateSign(gen, set.getSign(), set.getWallSign(), planks(set), blockTexture(set, "_sign"));
 			}
 			if (set.hasHangingSigns()) {
-				generateHangingSign(gen, set.getHangingSign(), set.getWallHangingSign(), strippedLog(set));
+				generateHangingSign(gen, set.getHangingSign(), set.getWallHangingSign(), strippedLog(set), blockTexture(set, "_hanging_sign"));
 			}
 			if (set.hasShelf()) {
 				gen.createShelf(set.getShelf(), strippedLog(set));
@@ -219,9 +220,9 @@ public final class WoodenDatagen {
 	 * Same as vanilla's {@code BlockFamilyProvider.sign}: since 26.2 signs are block models.
 	 * Texture {@code textures/block/<wood>_sign.png}, particles from the planks.
 	 */
-	private static void generateSign(BlockModelGenerators gen, Block sign, Block wallSign, Block planks) {
+	private static void generateSign(BlockModelGenerators gen, Block sign, Block wallSign, Block planks, Material texture) {
 		TextureMapping mapping = new TextureMapping()
-				.put(TextureSlot.ALL, TextureMapping.getBlockTexture(sign))
+				.put(TextureSlot.ALL, texture)
 				.put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(planks));
 		gen.blockStateOutput.accept(BlockModelGenerators.createSign(sign,
 				variant(gen, ModelTemplates.SIGN_ROT_0, sign, "_rot_0", mapping),
@@ -237,9 +238,9 @@ public final class WoodenDatagen {
 	 * Same as vanilla's {@code BlockFamilyProvider.hangingSign}.
 	 * Texture {@code textures/block/<wood>_hanging_sign.png}, particles from the stripped log.
 	 */
-	private static void generateHangingSign(BlockModelGenerators gen, Block hangingSign, Block wallHangingSign, Block strippedLog) {
+	private static void generateHangingSign(BlockModelGenerators gen, Block hangingSign, Block wallHangingSign, Block strippedLog, Material texture) {
 		TextureMapping mapping = new TextureMapping()
-				.put(TextureSlot.ALL, TextureMapping.getBlockTexture(hangingSign))
+				.put(TextureSlot.ALL, texture)
 				.put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(strippedLog));
 		gen.blockStateOutput.accept(BlockModelGenerators.createHangingSign(hangingSign,
 				variant(gen, ModelTemplates.HANGING_SIGN_ROT_0, hangingSign, "_rot_0", mapping),
@@ -253,6 +254,11 @@ public final class WoodenDatagen {
 		MultiVariant wallModel = BlockModelGenerators.plainVariant(ModelTemplates.WALL_HANGING_SIGN.create(wallHangingSign, mapping, gen.modelOutput));
 		gen.blockStateOutput.accept(MultiVariantGenerator.dispatch(wallHangingSign, wallModel).with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING_ALT));
 		gen.registerSimpleFlatItemModel(hangingSign.asItem());
+	}
+
+	/** {@code <namespace>:block/<wood><suffix>}: named after the wood, also when the sign blocks have custom ids. */
+	private static Material blockTexture(WoodSet set, String suffix) {
+		return new Material(set.getId().withPath(path -> "block/" + path + suffix));
 	}
 
 	private static MultiVariant variant(BlockModelGenerators gen, ModelTemplate template, Block block, String suffix, TextureMapping mapping) {
