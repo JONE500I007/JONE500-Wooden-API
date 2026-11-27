@@ -23,14 +23,14 @@ Each Minecraft version has its own Wooden API file. On the
 The version number has two parts: the Wooden API version, then `+`, then the Minecraft version.
 
 ```
-1.0.0+1.21.10
+1.1.0+1.21.10
 └─┬─┘ └──┬──┘
   │      └── for Minecraft 1.21.10
-  └───────── Wooden API version 1.0.0
+  └───────── Wooden API version 1.1.0
 ```
 
-So for Minecraft 1.21.9 you would use `1.0.0+1.21.9`, and for 1.21.10 `1.0.0+1.21.10`. The
-examples below use `1.0.0+1.21.10`; change the part after `+` to **your** Minecraft version.
+So for Minecraft 1.21.9 you would use `1.1.0+1.21.9`, and for 1.21.10 `1.1.0+1.21.10`. The
+examples below use `1.1.0+1.21.10`; change the part after `+` to **your** Minecraft version.
 
 ## Requirements
 
@@ -75,10 +75,10 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:jone500-wooden-api:1.0.0+1.21.10"
+    modImplementation "maven.modrinth:jone500-wooden-api:1.1.0+1.21.10"
 
     // Optional, see below
-    // include "maven.modrinth:jone500-wooden-api:1.0.0+1.21.10"
+    // include "maven.modrinth:jone500-wooden-api:1.1.0+1.21.10"
 }
 ```
 
@@ -107,8 +107,8 @@ too: you need both. Your `dependencies` in `build.gradle` then look like this:
 
 ```groovy
 dependencies {
-    modImplementation "maven.modrinth:jone500-wooden-api:1.0.0+1.21.10"   // lets you use Wooden API in your code
-    include "maven.modrinth:jone500-wooden-api:1.0.0+1.21.10"             // puts Wooden API inside your mod's jar
+    modImplementation "maven.modrinth:jone500-wooden-api:1.1.0+1.21.10"   // lets you use Wooden API in your code
+    include "maven.modrinth:jone500-wooden-api:1.1.0+1.21.10"             // puts Wooden API inside your mod's jar
 }
 ```
 
@@ -371,6 +371,32 @@ the game stops with an error that tells you which method is missing.
 | `.blockSetType(BlockSetType)` | Block set type used when creating the wood type (default: oak) |
 | `.nonFlammable()` | Does not burn |
 | `.noCreativeTabs()` | Don't add the items to the vanilla creative tabs (if you have your own tab) |
+| `.signIds(standing, wall)` | Your own block ids for the sign blocks (since 1.1.0). Only for [moving signs your mod already had](#moving-signs-your-mod-already-had) |
+| `.hangingSignIds(ceiling, wall)` | The same for the hanging sign blocks (since 1.1.0) |
+
+### Moving signs your mod already had
+
+Did your mod already have its own signs before you used Wooden API? Then their blocks may have other
+ids than Wooden API's (`maple_sign`, `maple_wall_sign`, ...), for example `maple_standing_sign`.
+**A block whose id changes disappears from existing worlds.** Give the blocks their old ids, and old
+worlds keep their signs:
+
+```java
+public static final WoodSet MAPLE = WoodSet.builder(Identifier.of("mymod", "maple"))
+        .planks(ModBlocks.MAPLE_PLANKS)
+        .strippedLog(ModBlocks.STRIPPED_MAPLE_LOG)
+        .signIds(Identifier.of("mymod", "maple_standing_sign"),      // your old ids
+                 Identifier.of("mymod", "maple_wall_sign"))
+        .hangingSigns()
+        .boats()
+        .register();
+```
+
+- `signIds(...)` also turns on `.signs()`, and `hangingSignIds(...)` turns on `.hangingSigns()`.
+- Only the **blocks** get your ids. The items keep Wooden API's ids (`maple_sign`,
+  `maple_hanging_sign`), and the textures keep their normal names (see [step 3](#3-draw-the-textures)).
+  If your old items had other ids, they can't be kept.
+- Needs Wooden API **1.1.0** or newer: use `">=1.1.0"` in your `fabric.mod.json`.
 
 ---
 
@@ -552,10 +578,10 @@ Try placing each sign, writing on it, putting items on the shelf and riding the 
 1. Check the changelog of the new version on Modrinth.
 2. Change the version number in your `build.gradle`:
    ```groovy
-   modImplementation "maven.modrinth:jone500-wooden-api:1.1.0+1.21.10"   // was 1.0.0+1.21.10
+   modImplementation "maven.modrinth:jone500-wooden-api:1.2.0+1.21.10"   // was 1.1.0+1.21.10
    ```
    If you also moved your mod to a new Minecraft version, change the part after `+` too
-   (e.g. `1.1.0+1.21.11`).
+   (e.g. `1.2.0+1.21.11`).
 3. Reload Gradle in your IDE.
 4. If you use something that is new in this version, raise the `>=` version in your
    `fabric.mod.json` too.

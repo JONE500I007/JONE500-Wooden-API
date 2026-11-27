@@ -72,6 +72,8 @@ import net.minecraft.util.Identifier;
  *       {@code maple_chest_boat}, {@code maple_shelf} (or {@code maple_raft} / {@code maple_chest_raft})</li>
  *   <li>Entities: {@code maple_boat}, {@code maple_chest_boat} (or the raft ids)</li>
  * </ul>
+ * Moving signs your mod already had? {@link Builder#signIds} and {@link Builder#hangingSignIds} keep their old
+ * block ids, so they don't disappear from existing worlds.
  *
  * <p>Textures your mod has to provide (namespace {@code mymod}):
  * <ul>
@@ -125,12 +127,12 @@ public final class WoodSet {
 
 		// ---- Signs ----
 		if (b.signs) {
-			Block standing = Blocks.register(blockKey("_sign"), s -> new SignBlock(this.woodType, s), signSettings(b.mapColor));
-			Block wall = Blocks.register(blockKey("_wall_sign"), s -> new WallSignBlock(this.woodType, s),
+			Block standing = Blocks.register(blockKey(b.signId, "_sign"), s -> new SignBlock(this.woodType, s), signSettings(b.mapColor));
+			Block wall = Blocks.register(blockKey(b.wallSignId, "_wall_sign"), s -> new WallSignBlock(this.woodType, s),
 					signSettings(copyLootTable(standing), b.mapColor));
 			this.sign = standing;
 			this.wallSign = wall;
-			this.signItem = Items.register(standing, (block, s) -> new SignItem(block, wall, s), new Item.Settings().maxCount(16));
+			this.signItem = Items.register(itemKey("_sign"), s -> new SignItem(standing, wall, s), new Item.Settings().maxCount(16).translationKey(standing.getTranslationKey()));
 			BlockEntityType.SIGN.addSupportedBlock(standing);
 			BlockEntityType.SIGN.addSupportedBlock(wall);
 		} else {
@@ -141,12 +143,12 @@ public final class WoodSet {
 
 		// ---- Hanging signs ----
 		if (b.hangingSigns) {
-			Block ceiling = Blocks.register(blockKey("_hanging_sign"), s -> new HangingSignBlock(this.woodType, s), signSettings(hangingColor));
-			Block wall = Blocks.register(blockKey("_wall_hanging_sign"), s -> new WallHangingSignBlock(this.woodType, s),
+			Block ceiling = Blocks.register(blockKey(b.hangingSignId, "_hanging_sign"), s -> new HangingSignBlock(this.woodType, s), signSettings(hangingColor));
+			Block wall = Blocks.register(blockKey(b.wallHangingSignId, "_wall_hanging_sign"), s -> new WallHangingSignBlock(this.woodType, s),
 					signSettings(copyLootTable(ceiling), hangingColor));
 			this.hangingSign = ceiling;
 			this.wallHangingSign = wall;
-			this.hangingSignItem = Items.register(ceiling, (block, s) -> new HangingSignItem(block, wall, s), new Item.Settings().maxCount(16));
+			this.hangingSignItem = Items.register(itemKey("_hanging_sign"), s -> new HangingSignItem(ceiling, wall, s), new Item.Settings().maxCount(16).translationKey(ceiling.getTranslationKey()));
 			BlockEntityType.HANGING_SIGN.addSupportedBlock(ceiling);
 			BlockEntityType.HANGING_SIGN.addSupportedBlock(wall);
 		} else {
@@ -357,6 +359,11 @@ public final class WoodSet {
 		return RegistryKey.of(RegistryKeys.BLOCK, id.withSuffixedPath(suffix));
 	}
 
+	/** The block id given with {@code signIds(...)} / {@code hangingSignIds(...)}, or {@code <wood><suffix>}. */
+	private RegistryKey<Block> blockKey(@Nullable Identifier custom, String suffix) {
+		return custom != null ? RegistryKey.of(RegistryKeys.BLOCK, custom) : blockKey(suffix);
+	}
+
 	private RegistryKey<Item> itemKey(String suffix) {
 		return RegistryKey.of(RegistryKeys.ITEM, id.withSuffixedPath(suffix));
 	}
@@ -404,6 +411,10 @@ public final class WoodSet {
 		private boolean hangingSigns;
 		private boolean boats;
 		private boolean shelf;
+		@Nullable private Identifier signId;
+		@Nullable private Identifier wallSignId;
+		@Nullable private Identifier hangingSignId;
+		@Nullable private Identifier wallHangingSignId;
 
 		private Builder(Identifier id) {
 			this.id = Objects.requireNonNull(id, "id");
@@ -505,6 +516,35 @@ public final class WoodSet {
 		public Builder noCreativeTabs() {
 			this.addToCreativeTabs = false;
 			return this;
+		}
+
+		/**
+		 * Gives the sign blocks your own ids instead of {@code <wood>_sign} and {@code <wood>_wall_sign}.
+		 * Also turns on {@link #signs()}.
+		 *
+		 * <p>Only needed when you move signs that your mod <b>already had</b> to Wooden API: a block whose id
+		 * changes disappears from existing worlds, so give the blocks their old ids here. The item keeps its
+		 * normal id ({@code <wood>_sign}), and the textures keep their normal names.
+		 *
+		 * <pre>{@code
+		 * .signIds(Identifier.of("mymod", "apple_standing_sign"),
+		 *          Identifier.of("mymod", "apple_wall_sign"))
+		 * }</pre>
+		 */
+		public Builder signIds(Identifier standing, Identifier wall) {
+			this.signId = Objects.requireNonNull(standing, "standing");
+			this.wallSignId = Objects.requireNonNull(wall, "wall");
+			return signs();
+		}
+
+		/**
+		 * Like {@link #signIds}, for the hanging sign: your own ids instead of {@code <wood>_hanging_sign} and
+		 * {@code <wood>_wall_hanging_sign}. Also turns on {@link #hangingSigns()}. The item keeps its normal id.
+		 */
+		public Builder hangingSignIds(Identifier ceiling, Identifier wall) {
+			this.hangingSignId = Objects.requireNonNull(ceiling, "ceiling");
+			this.wallHangingSignId = Objects.requireNonNull(wall, "wall");
+			return hangingSigns();
 		}
 
 		/** Registers everything. Call this during your mod's {@code onInitialize()}. */
