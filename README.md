@@ -141,7 +141,7 @@ version, and copy the **File ID** number. Each Minecraft version has a different
 
 - **Project ID** (red arrow, in the box on the **right** side of the page): `1815936`. The same for
   every file.
-- **File ID** (blue arrow, in the file's details, under **FILE ID**): `9695055` in the picture (the
+- **File ID** (blue arrow, in the file's details, under **FILE ID**): `9695055` in the picture (the 1.0.0
   26.3 file). Different for every file. The small button next to each number copies it.
 
 **2. Add CurseMaven to `build.gradle`:**
@@ -162,24 +162,24 @@ repositories {
 }
 
 dependencies {
-    implementation "curse.maven:jone500-wooden-api-1815936:9695038"
+    implementation "curse.maven:jone500-wooden-api-1815936:9840040"
 
     // Optional: put Wooden API inside your mod's jar (see "What is include?" above)
-    // include "curse.maven:jone500-wooden-api-1815936:9695038"
+    // include "curse.maven:jone500-wooden-api-1815936:9840040"
 }
 ```
 
 The dependency has three parts:
 
 ```
-curse.maven:jone500-wooden-api-1815936:9695038
+curse.maven:jone500-wooden-api-1815936:9840040
             └────────┬───────┘ └──┬──┘ └──┬──┘
                      │            │       └── File ID (changes for every file / Minecraft version)
                      │            └────────── Project ID of Wooden API (always 1815936)
                      └─────────────────────── any name you like, usually the mod's slug
 ```
 
-`9695038` is the file for **Minecraft 26.2**. For another Minecraft version, replace only the last
+`9840040` is the file for **Minecraft 26.2**. For another Minecraft version, replace only the last
 number with the File ID from step 1.
 
 **3.** The `fabric.mod.json` part is the same as above (`"jone500_wooden_api": ">=1.0.0"`).
